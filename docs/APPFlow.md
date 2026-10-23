@@ -136,3 +136,97 @@ flowchart TD
 - **Estados:** `loading` · `ok` · `vacío` (con acceso al catálogo) · `error`.
 - **APIs que consume:** `GET /api/v1/roadmap?page=&page_size=` · `PATCH /api/v1/roadmap/items/{id}` · `POST /api/v1/roadmap/items/{id}/mover` · `DELETE /api/v1/roadmap/items/{id}`.
 - **Navegación:** hacia el catálogo y hacia el detalle de cada curso.
+
+
+## 4. Flujos de usuario
+
+### Flujo 1 — Aportar un curso al catálogo
+
+1. Un usuario con sesión elige "Aportar curso" en el menú y llega a `/aportar`.
+2. La pantalla carga las categorías (`GET /categorias`) y muestra el formulario: enlace, categoría, tema, título, versión, año de edición, docentes, casillas (cuestionarios, examen, certificado), organización que lo avala (opcional) y "¿Tomaste este curso?".
+3. Validación en línea: obligatorios, enlace con formato `http` o `https`, año numérico, declaración elegida.
+4. Al enviar: `POST /aportes`. Respuesta 201 con estado `en_revision`.
+5. Toast "Tu aporte quedó en revisión" y redirección a `/mis-aportes`.
+6. **Ramas de error:**
+   - 422: se marcan los campos inválidos y no se pierde nada de lo escrito.
+   - 409: el campo enlace muestra "Este curso ya fue aportado".
+   - 401 (sesión vencida): toast, redirección a `/login?volver=/aportar`.
+   - Error de red: toast de error con reintento; los datos se conservan.
+
+### Flujo 2 — Descubrir un curso y agregarlo al roadmap
+
+1. Cualquier persona entra a `/catalogo` y ve la primera página de cursos publicados.
+2. Escribe un texto y elige una categoría; la URL se actualiza y la lista se recarga (`GET /cursos?q=&categoria=`).
+3. Abre un curso (`/catalogo/:id`) y lee sus datos; "Ir al curso" abre el enlace externo en otra pestaña.
+4. Presiona "Agregar a mi roadmap".
+5. **Sin sesión:** va a `/login?volver=/catalogo/:id` y, al entrar, vuelve al curso para repetir la acción.
+6. **Con sesión:** `POST /roadmap/items`. Respuesta 201, toast "Agregado a tu roadmap" y la card pasa a "En tu roadmap".
+7. **Ramas alternativas:** 409 (ya estaba) muestra el estado "En tu roadmap"; 404 (el curso ya no está publicado) muestra un toast de error y recarga la lista.
+8. Desde el menú, "Mi roadmap" muestra el curso agregado.
+
+### Flujo 3 — Validación de un aporte (moderador)
+
+1. El moderador inicia sesión y ve la opción "Validar" en el menú.
+2. En `/validar` aparece la lista paginada de aportes en revisión, los más antiguos primero (`GET /aportes/pendientes`).
+3. Revisa los datos del aporte y abre el enlace del curso.
+4. **Aprobar:** `POST /aportes/{id}/validar` con `aprobado: true`. El aporte sale de la lista y pasa a publicado.
+5. **Rechazar:** abre el modal, escribe el motivo (obligatorio) y confirma; mismo endpoint con `aprobado: false` y `motivo`.
+6. Toast de resultado y recarga de la lista; si la página quedó vacía, se retrocede a la anterior.
+7. **Ramas de error:** 409 (otra decisión ya fue tomada) muestra un toast y recarga; 422 (motivo vacío) bloquea el botón y marca el campo; 403 (usuario sin rol) muestra "No tenés permiso".
+
+### Flujo 4 — Registro e inicio de sesión
+
+1. La persona abre `/registro`, completa nombre, email y contraseña (de 8 a 72 caracteres) y envía (`POST /auth/registro`).
+2. Éxito: redirección a `/login` con toast "Cuenta creada, ya podés iniciar sesión".
+3. En `/login` envía sus credenciales (`POST /auth/login`); el backend responde con la sesión en una cookie.
+4. Redirección a la ruta de `?volver=` o a `/catalogo`; el header muestra su nombre.
+5. **Ramas de error:**
+   - Registro 409: "Ese email ya está registrado".
+   - Login 401: mensaje genérico, sin indicar si falló el email o la contraseña.
+   - Login 429 (más de 5 fallos en 15 minutos): el formulario se bloquea y muestra cuánto esperar.
+6. Para salir, "Cerrar sesión" en el menú (`POST /auth/logout`) y vuelta a `/catalogo`.
+
+### Flujo 5 — Recuperar la contraseña
+
+1. En `/login`, el enlace "Olvidé mi contraseña" lleva a `/olvide-password`.
+2. La persona ingresa su email y envía (`POST /auth/recuperar`); siempre ve el mismo mensaje de confirmación.
+3. En desarrollo el enlace de restablecimiento se escribe en el log del backend (TD-006).
+4. Abre `/restablecer-password/:token`, define la nueva contraseña y envía (`POST /auth/restablecer`).
+5. Éxito: redirección a `/login` con toast.
+6. **Rama de error:** token vencido o ya usado (422): mensaje claro y enlace para pedir otro.
+
+## 5. Estados globales de la app
+
+| Situación | Comportamiento |
+|-----------|----------------|
+| Sin sesión y ruta protegida | redirección a `/login?volver=<ruta original>` |
+| Sesión vencida (cualquier llamada con respuesta 401 estando logueado) | toast "Tu sesión venció", se limpia el estado de sesión y se redirige a `/login?volver=<ruta actual>` |
+| Usuario sin rol en `/validar` | pantalla "No tenés permiso" con enlace al catálogo |
+| Ruta inexistente | pantalla "Página no encontrada" con enlace al catálogo |
+| Error de red en un listado | estado de error del listado con botón "Reintentar" |
+| Error de red en una acción | toast de error; los datos del formulario se conservan |
+| Error 500 | toast genérico "Algo salió mal"; sin detalles técnicos |
+
+## 6. Matriz de coherencia (historia → pantalla → endpoint)
+
+| Historia | Pantallas | Endpoints |
+|----------|-----------|-----------|
+| US-001 | Catálogo, Detalle | `GET /cursos`, `GET /cursos/{id}` |
+| US-002 | Registro | `POST /auth/registro` |
+| US-003 | Login, header | `POST /auth/login`, `POST /auth/logout`, `GET /auth/me` |
+| US-004 | Aportar | `GET /categorias`, `POST /aportes` |
+| US-005 | Validación | `GET /aportes/pendientes`, `POST /aportes/{id}/validar` |
+| US-006 | Catálogo, Detalle, Mi roadmap | `POST /roadmap/items`, `GET /roadmap` |
+| US-007 | Catálogo | `GET /cursos` (`q`, `categoria`), `GET /categorias` |
+| US-008 | Olvidé, Restablecer | `POST /auth/recuperar`, `POST /auth/restablecer` |
+| US-009 | Mis aportes | `GET /aportes/mios` |
+| US-010 | Mi roadmap | `PATCH /roadmap/items/{id}`, `POST /roadmap/items/{id}/mover`, `DELETE /roadmap/items/{id}` |
+
+> Todos los endpoints llevan el prefijo `/api/v1`. Los 18 endpoints del BackendSchema
+> aparecen en esta matriz: ninguno queda sin pantalla y ninguna pantalla consume una API inexistente.
+
+---
+
+**Referencias:**
+- NN/g — Information Architecture vs. Sitemaps: https://www.nngroup.com/articles/information-architecture-sitemaps/
+- NN/g — User Journeys vs. User Flows: https://www.nngroup.com/articles/user-journeys-vs-user-flows/
