@@ -3,7 +3,7 @@
 > WebApp de gestión de comunidad de cursos: catálogo comunitario de cursos gratuitos
 > aportados y validados por los usuarios, más roadmaps personales de aprendizaje.
 >
-> **Estado:** Documentación (Instancia A) en preparación. Desarrollo pendiente de aprobación docente.
+> **Estado:** Documentación (Instancia A) enviada a aprobación el 23/10/2026. Desarrollo pendiente de aprobación docente.
 
 **Stack:** React 19 + Vite + pnpm · FastAPI + uv · PostgreSQL 18.6 · Docker Compose (dev)
 
@@ -41,7 +41,7 @@ arma su roadmap personal de aprendizaje.
 
 | Instancia | Contenido | Estado |
 |-----------|-----------|--------|
-| A — Documentación | repo + 7 documentos | En preparación |
+| A — Documentación | repo + 7 documentos | Enviada a aprobación el 23/10/2026 |
 | B — Desarrollo del MVP | ejecución del Implementation Plan | Pendiente de aprobación |
 | Clase 27/10 | testing, Docker multi-stage, gestión del cambio | Pendiente |
 
