@@ -1,0 +1,32 @@
+# Node / Vite / pnpm
+node_modules/
+dist/
+.vite/
+.pnpm-store/
+pnpm-debug.log*
+npm-debug.log*
+
+# Python / uv
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Docker / datos locales
+postgres-data/
+*.log
+
+# Editor / SO
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
