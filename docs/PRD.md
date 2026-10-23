@@ -93,3 +93,63 @@ usuario arma su roadmap personal de aprendizaje, con orden y seguimiento de avan
 | RF-018 | El sistema permite cambiar el orden y el estado de avance de un ítem del roadmap | US-010 |
 | RF-019 | El sistema permite quitar un ítem del roadmap | US-010 |
 | RF-020 | El sistema restringe rutas y acciones según sesión y rol | US-003, US-005 |
+
+
+## 6. Requisitos no funcionales
+
+| ID | Requisito | Notas |
+|----|-----------|-------|
+| RNF-001 | Todos los listados y sus tablas están paginados | heredado de la SPEC de clase |
+| RNF-002 | Mobile-first con mejora progresiva | heredado de la SPEC de clase |
+| RNF-003 | Menú sándwich en mobile | heredado de la SPEC de clase |
+| RNF-004 | Screaming Architecture: las carpetas comunican el dominio | heredado de la SPEC de clase |
+| RNF-005 | Apariencia y experiencia inspiradas en Google | heredado de la SPEC; detalle en UX-UI |
+| RNF-006 | Contraseñas cifradas con bcrypt (costo 12) | heredado de la SPEC; justificación en TRD |
+| RNF-007 | La primera página del catálogo carga en menos de 2 s con 1.000 cursos de prueba | decisión propia, medida en desarrollo local |
+| RNF-008 | Accesibilidad mínima: contraste AA, foco visible y navegación por teclado | decisión propia; detalle en UX-UI §6 |
+| RNF-009 | En una máquina limpia, `docker compose up` levanta base de datos, backend y frontend | criterio de la Instancia B |
+| RNF-010 | La API devuelve errores con un formato uniforme | decisión propia; ver TRD TD-003 |
+
+## 7. Reglas de negocio
+
+| ID | Regla | Fuente |
+|----|-------|--------|
+| BR-001 | Un curso aportado no aparece en el catálogo comunitario hasta ser validado | SPEC clase |
+| BR-002 | Quien aporta un curso declara si lo tomó o no | SPEC clase |
+| BR-003 | El roadmap es personal: cada usuario ve y edita solo el suyo | decisión propia |
+| BR-004 | Un mismo enlace de curso no puede existir dos veces, en ningún estado. El enlace se normaliza antes de comparar: host en minúsculas, sin fragmento, sin barra final y sin parámetros `utm_*` | decisión propia |
+| BR-005 | Solo un moderador valida o rechaza aportes; el rechazo exige un motivo | decisión propia |
+| BR-006 | Solo los cursos publicados pueden incluirse en un roadmap | decisión propia |
+| BR-007 | Un curso aparece una sola vez en el roadmap de cada usuario | decisión propia |
+| BR-008 | El token de recuperación es de un solo uso y vence a la hora; la solicitud responde igual exista o no el email | decisión propia |
+| BR-009 | Máximo 5 intentos fallidos de login en 15 minutos por combinación IP + email; luego se bloquea hasta que pase la ventana | SPEC clase (rate limit) + decisión propia |
+| BR-010 | Las contraseñas se guardan cifradas con bcrypt y tienen al menos 8 caracteres | SPEC clase + decisión propia |
+| BR-011 | El email es único, sin distinguir mayúsculas | decisión propia |
+
+## 8. Fuera de alcance (out of scope)
+
+- Cursos de pago y cualquier pasarela de cobro.
+- Alojar o reproducir contenido de los cursos: solo se guarda el enlace externo.
+- Verificación automática de enlaces o extracción (scraping) de datos de las plataformas.
+- Valoraciones, comentarios o foros sobre los cursos.
+- Roadmaps públicos o compartidos entre usuarios.
+- Envío real de correos: en desarrollo el token de recuperación se registra en el log del backend.
+- Gestión de usuarios y roles desde la interfaz: el moderador se crea por seed.
+- Edición de aportes enviados y reenvío de aportes rechazados: se aporta uno nuevo.
+- Inicio de sesión con redes sociales, app móvil nativa e internacionalización.
+
+## 9. Supuestos y decisiones sobre la SPEC de clase
+
+Los vacíos de la SPEC y las decisiones tomadas están en [SPEC §8](SPEC.md). Supuestos principales:
+
+- Hay un único moderador, creado por seed; el sistema no gestiona su alta.
+- Las categorías son una lista cerrada cargada por seed.
+- La interfaz está en español.
+
+## 10. Preguntas abiertas
+
+| Pregunta | Impacto | Estado |
+|----------|---------|--------|
+| ¿Los aportes sin validar expiran después de un tiempo? | bajo | abierta; fuera del MVP |
+| ¿Cómo se normalizan los enlaces con parámetros de seguimiento? | medio | decidida → BR-004 |
+| ¿Un moderador puede validar su propio aporte? | bajo | decidida: se permite en el MVP porque hay un único moderador por seed; se revisa si se agregan más |
