@@ -133,3 +133,32 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 4.4 | Campo `en_mi_roadmap` en `GET /cursos` y `GET /cursos/{id}` | con sesión devuelve `true` para los cursos ya incluidos; sin sesión, siempre `false` | 30 min |
 | 4.5 | Botón "Agregar a mi roadmap" en cards y detalle (con redirección a login si no hay sesión) | Flujo 2 del APPFlow, pasos 4 a 7: sin sesión va a `/login?volver=…`; con sesión muestra el toast y la card pasa a "En tu roadmap" | 1 h |
 | 4.6 | Pantalla Mi roadmap | **US-006:** el curso agregado aparece en `/roadmap`; sin cursos se ve el estado vacío con acceso al catálogo; en 360 px se ve como cards y desde 768 px como tabla | 1 h 30 min |
+
+
+### M5 — Complementos del catálogo y del roadmap (P1)
+
+| # | Tarea | Hecho cuando… | Estimación |
+|---|-------|----------------|------------|
+| 5.1 | **US-007:** filtros `q` y `categoria` en `GET /cursos` y búsqueda y filtro en la pantalla Catálogo, con el estado en la URL | el texto filtra por título o tema; la categoría filtra por categoría; combinados aplican ambos y el `total` del paginador refleja el filtrado; sin resultados se ve el estado vacío con "Limpiar filtros" | 2 h |
+| 5.2 | `GET /aportes/mios` | devuelve solo los aportes del usuario, paginados, con `estado` y `motivo_rechazo` | 45 min |
+| 5.3 | **US-009:** pantalla Mis aportes con badges de estado (UX-UI §4.5) | se ven los aportes con su estado e icono; un aporte rechazado muestra su motivo; sin aportes aparece el estado vacío | 1 h 30 min |
+| 5.4 | `PATCH /roadmap/items/{id}` y `POST /roadmap/items/{id}/mover` | cambiar `estado_avance` responde 200; subir y bajar intercambia posiciones con el vecino y en el extremo no cambia nada; un ítem ajeno da 404 | 1 h 30 min |
+| 5.5 | `DELETE /roadmap/items/{id}` | 204 y el ítem desaparece de `GET /roadmap`; un ítem ajeno da 404 | 30 min |
+| 5.6 | **US-010:** controles del roadmap (select de avance, Subir y Bajar, Quitar con modal) | los cambios se mantienen al recargar; quitar pide confirmación; todo se opera con teclado | 2 h |
+
+### M6 — Recuperación de contraseña (P1)
+
+| # | Tarea | Hecho cuando… | Estimación |
+|---|-------|----------------|------------|
+| 6.1 | Migración y modelo `password_reset_tokens` | `\d password_reset_tokens` coincide con el BackendSchema §1.2 | 20 min |
+| 6.2 | `POST /auth/recuperar` (respuesta 202 uniforme, token con hash, enlace en el log) | un email existente y uno inexistente devuelven exactamente la misma respuesta; para el existente aparece el enlace en `docker compose logs backend` | 1 h |
+| 6.3 | `POST /auth/restablecer` | con un token válido cambia la contraseña y el login funciona con la nueva; el mismo token usado otra vez da 422; un token vencido da 422 | 1 h |
+| 6.4 | **US-008:** pantallas Olvidé mi contraseña y Restablecer | el flujo 5 del APPFlow se completa desde la UI, incluido el mensaje de token inválido con enlace para pedir otro | 1 h 30 min |
+
+### M7 — Cierre y verificación (P0)
+
+| # | Tarea | Hecho cuando… | Estimación |
+|---|-------|----------------|------------|
+| 7.1 | README con instrucciones de ejecución verificables | incluye requisitos (Docker y Docker Compose), `cp .env.example .env`, `docker compose up`, las URLs (frontend `:5173`, documentación de la API `:8000/docs`), las credenciales del moderador de prueba y cómo reiniciar la base | 30 min |
+| 7.2 | Verificación en máquina limpia | un clon nuevo del repo, siguiendo solo el README, completa el recorrido del §1 sin errores en consola ni en los logs | 1 h |
+| 7.3 | Actualizar la tabla de ejecución (§4) | todas las tareas terminadas están en `[x]` con su rama y commit | 20 min |
