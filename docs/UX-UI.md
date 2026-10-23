@@ -119,3 +119,117 @@ El tamaño mínimo de texto es 14 px.
   --z-toast: 300;
 }
 ```
+
+## 3. Estrategia mobile-first con mejora progresiva
+
+> Obligatorio según la SPEC. **Prohibido** usar media queries para "arreglar" el layout base:
+> solo para agregar o mejorar a medida que la pantalla crece.
+
+| Capa | Dónde aplica | Qué define |
+|------|--------------|------------|
+| **Base (sin media queries)** | todos los viewports, diseñado para 360 px | una columna; header con hamburguesa; catálogo como cards apiladas; tablas como cards; botones de ancho completo en formularios y modales; targets táctiles de al menos 44 px |
+| `@media (min-width: 768px)` | tablet | catálogo en 2 columnas; tablas como tabla real; formulario de aporte en 2 columnas; paginador con números; botones de ancho automático |
+| `@media (min-width: 1024px)` | desktop | catálogo en 3 columnas; navegación horizontal en el header y hamburguesa oculta; contenedor con ancho máximo |
+
+Patrón obligatorio de escritura del CSS:
+
+```css
+.catalogo-grid { display: grid; gap: var(--space-4); }                 /* base: 1 columna */
+@media (min-width: 768px)  { .catalogo-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .catalogo-grid { grid-template-columns: repeat(3, 1fr); } }
+```
+
+## 4. Componentes (anatomía y estados)
+
+### 4.1 Botón
+
+- **Primario:** fondo `--color-primary`, texto `--color-on-primary`, `--radius-button`, alto mínimo 44 px, padding horizontal 24 px, Roboto 500 14 px. Hover: fondo `--color-primary-dark` y `--shadow-1`.
+- **Secundario:** sin relleno, borde 1 px `--color-border-strong`, texto `--color-primary-dark`. Hover: fondo `--color-hover-grey`.
+- **Peligro:** fondo `--color-error`, texto `--color-on-primary`. Siempre con confirmación previa (modal).
+- Estados de todos: `default`, `hover`, `focus-visible` (anillo de 2 px `--color-primary` con separación de 2 px), `active`, `disabled` (opacidad .38, sin puntero, atributo `disabled`), `loading` (spinner, `aria-busy="true"`, deshabilitado).
+- Un botón que solo tiene icono lleva `aria-label`.
+
+### 4.2 Campo de formulario (input, select, textarea, casillas)
+
+- Anatomía: `label` **siempre visible** encima, campo de 48 px de alto con borde 1 px `--color-border-strong` y `--radius-input`, texto de ayuda opcional debajo.
+- Estados: `default` · `hover` (borde `--color-text`) · `focus` (borde 2 px `--color-primary`) · `filled` · `error` (borde 2 px `--color-error`, icono y mensaje en `--color-error`, `aria-invalid="true"` y `aria-describedby` apuntando al mensaje) · `disabled` (fondo `--color-hover-grey`).
+- Casillas y radios: control de 24 px con área táctil de 44 px; el texto de la opción forma parte del `label`.
+- Los campos obligatorios se marcan con texto ("obligatorio"), no solo con asterisco de color.
+
+### 4.3 Formulario de aporte
+
+- Secciones en una columna (base) y dos columnas desde 768 px:
+  1. **Enlace del curso** (URL).
+  2. **Datos:** categoría (select con la lista cerrada), tema, título, versión, año de edición, docentes o disertantes.
+  3. **Características:** casillas "Tiene cuestionarios", "Requiere examen", "Extiende certificado", y campo opcional "Organización que lo avala".
+  4. **Declaración:** grupo de radios "¿Tomaste este curso?" (Sí / No), obligatorio y sin valor preseleccionado (BR-002).
+- Validación en línea al salir de cada campo y al enviar; el foco pasa al primer campo con error; **nunca se pierde lo escrito**.
+- Envío: botón primario "Aportar curso" en estado `loading`; éxito con toast y redirección a "Mis aportes".
+
+### 4.4 Card de curso
+
+- Superficie `--color-surface`, `--radius-card`, `--shadow-1`, padding `--space-4`.
+- Contenido, de arriba abajo: título (`--text-lg`, máximo 2 líneas), chip de categoría (`--color-primary-container`, texto `#174ea6`), docentes y "versión · año" (`--text-sm`, `--color-text-muted`), fila de badges con icono y texto (Certificado, Examen, Cuestionarios, Avalado), dominio del enlace y la marca "Quien lo aportó lo tomó" según BR-002, y la acción.
+- Acción: "Agregar a mi roadmap" (secundario) o, si ya está, el texto "En tu roadmap" con icono de check.
+- Estados: `default` · `hover` (`--shadow-2`) · `focus-visible` (anillo en el enlace del título) · `en mi roadmap` (borde 2 px `--color-primary` + icono + texto, nunca solo color) · `loading` (skeleton).
+
+### 4.5 Badge de estado del aporte
+
+| Estado | Fondo | Texto | Icono |
+|--------|-------|-------|-------|
+| en revisión | `--color-warning-container` | `#7a4100` | reloj |
+| publicado | `--color-success-container` | `#137333` | check |
+| rechazado | `--color-error-container` | `#b3261e` | cancelar |
+
+Siempre con icono **y** texto.
+
+### 4.6 Lista y tabla paginada
+
+Aplica a: catálogo (grid de cards), mis aportes, panel de validación y mi roadmap.
+
+- Desde 768 px: tabla real, encabezados con `scope="col"`, filas con divisor `--color-border` y hover `--color-hover-grey`.
+- En la base (< 768 px): las mismas filas como cards apiladas, con la misma información y sin scroll horizontal.
+- Debajo de cada listado va el paginador (§4.7).
+- Estados: `loading` (skeleton), `ok`, `vacío` (empty state con acción) y `error` (mensaje y botón "Reintentar").
+
+### 4.7 Paginador
+
+- Elemento `nav` con `aria-label="Paginación"`.
+- Base: botones "Anterior" y "Siguiente" y el texto "Página X de Y".
+- Desde 768 px: además números de página con puntos suspensivos; la página actual con `aria-current="page"` y fondo `--color-primary-container` con texto `#174ea6`.
+- "Anterior" se deshabilita en la primera página y "Siguiente" en la última. El tamaño de página es fijo (20), sin selector.
+
+### 4.8 Menú sándwich (drawer)
+
+- Se muestra por debajo de 1024 px: botón de 48 × 48 px en el extremo izquierdo del header, con `aria-label="Abrir menú"`, `aria-expanded` y `aria-controls`.
+- Panel: ancho 280 px (máximo 85 % del ancho de pantalla), fondo `--color-surface`, `--shadow-2`, overlay `rgba(32, 33, 36, .6)` y bloqueo del scroll del fondo.
+- Contenido: logo, enlaces según sesión y rol (Catálogo, Aportar, Mis aportes, Mi roadmap y, solo para el moderador, Validar), separador y zona de sesión (Ingresar y Registrarme, o el nombre y Cerrar sesión).
+- Ítems de 48 px de alto; el activo con fondo `--color-primary-container`, texto `#174ea6` y `aria-current="page"`.
+- Estados: cerrado y abierto. Cierre: toque en un enlace, botón X, tecla `ESC` o clic en el overlay.
+- ARIA y foco: `role="dialog"`, `aria-modal="true"`, foco atrapado dentro del panel y devuelto al botón al cerrar.
+
+### 4.9 Modal
+
+- Usos: confirmar quitar un curso del roadmap; rechazar un aporte (con campo de motivo obligatorio).
+- Superficie `--color-surface`, `--radius-modal`, `--shadow-2`, overlay igual al del drawer.
+- `role="dialog"`, `aria-modal="true"`, título con `aria-labelledby`, foco atrapado, cierre con `ESC` y botón X; el clic en el overlay no cierra mientras se envía.
+- Acciones: Cancelar (secundario) y la acción principal (primario o peligro). En la base van apiladas a ancho completo; desde 768 px, alineadas a la derecha.
+
+### 4.10 Toast
+
+- Fondo `--color-snackbar`, texto blanco, `--radius-input`, ancho mínimo 288 px.
+- Posición: inferior centrado en la base; inferior izquierda desde 768 px.
+- Tipos: éxito (icono de check), error (icono de alerta), info. Éxito e info duran 5 s; el error permanece 8 s y tiene botón de cierre. El tiempo se pausa con hover o foco.
+- Accesibilidad: `role="status"` para éxito e info, `role="alert"` para error.
+
+### 4.11 Skeleton, estado vacío y estado de error
+
+- **Skeleton:** bloques `--color-hover-grey` con brillo animado, con la forma de la card o fila que reemplazan.
+- **Vacío:** icono grande en `--color-text-muted`, título (`--text-lg`), una línea de explicación y una acción. Ejemplo: "Todavía no hay cursos en esta categoría. Aportá el primero".
+- **Error:** mensaje claro, botón "Reintentar" y, si corresponde, enlace de salida.
+
+### 4.12 Controles del roadmap
+
+- **Estado de avance:** `select` nativo con Pendiente, En curso y Completado.
+- **Orden:** botones "Subir" y "Bajar" con `aria-label` que incluye el título del curso. No hay arrastrar y soltar en el MVP, para que sea accesible por teclado.
+- **Quitar:** botón de texto con icono que abre el modal de confirmación (§4.9).
