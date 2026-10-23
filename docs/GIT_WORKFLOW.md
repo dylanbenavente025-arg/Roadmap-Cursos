@@ -43,3 +43,55 @@ git switch main
 git merge --no-ff docs/<nombre> -m "docs: merge docs/<nombre> branch"
 git push origin main
 ```
+
+## 4. Convención de commits
+
+Se usa **Conventional Commits** en el 100% de la historia, incluidos los merges:
+
+```
+<tipo>: <descripción corta en imperativo>
+```
+
+| Tipo | Cuándo |
+|------|--------|
+| `feat` | funcionalidad nueva |
+| `fix` | corrección de un defecto |
+| `docs` | documentación |
+| `test` | tests |
+| `refactor` | cambio interno sin alterar comportamiento |
+| `chore` | configuración, mantenimiento |
+| `docker` | contenedores y Compose |
+
+**Reglas:** mensaje específico, en inglés, en imperativo, sin punto final y de menos de
+72 caracteres.
+
+| Correcto | Incorrecto |
+|----------|------------|
+| `docs: add PRD user stories` | `docs: cambios` |
+| `docs: add course lifecycle states to BackendSchema` | `wip` |
+| `chore: add gitignore for react-vite-pnpm and fastapi-uv` | `update` |
+
+## 5. Cómo se mergea
+
+- Siempre con `--no-ff`, para que cada rama quede visible en la historia.
+- El mensaje del merge también es convencional: `<tipo>: merge <rama> branch`.
+- Las ramas remotas no se borran después del merge, para conservar el rastro.
+- **Única excepción** a "nada directo en `main`": el primer commit del repo,
+  que contiene la SPEC de clase original sin modificar.
+
+## 6. Revisión
+
+Trabajo individual: antes de cada merge hago una autorrevisión.
+
+- `git diff main..<rama>` revisado completo.
+- Los diagramas Mermaid renderizan en GitHub.
+- Los links entre documentos funcionan.
+- No hay archivos fuente de la aplicación en la Instancia A.
+
+## 7. Relación con las instancias
+
+- **Instancia A (documentación):** ramas `docs/*`, una por documento o grupo coherente.
+- **Instancia B (MVP):** una rama `feat/*` por tarea del Implementation Plan; al mergear
+  se actualiza la tabla de ejecución con la rama y el commit.
+- **Clase del 27/10 (gestión del cambio):** cada modificación entra como
+  ticket → rama → commit convencional → merge.
