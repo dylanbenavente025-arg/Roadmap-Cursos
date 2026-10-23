@@ -74,3 +74,29 @@ construyen, siguen y comparten para llegar a un objetivo de aprendizaje concreto
 | BR-005 | Solo un usuario con rol moderador valida o rechaza aportes; el rechazo exige un motivo | decisión propia |
 
 > El detalle completo de reglas vive en el PRD §7.
+
+
+## 6. Stack registrado (versiones exactas con las que se va a desarrollar)
+
+| Capa | Tecnología | Versión exacta instalada |
+|------|------------|--------------------------|
+| Frontend | React + Vite + pnpm | react 19.3.1 · vite 8.3.5 · pnpm 12.4.1 |
+| Backend | FastAPI + uv | fastapi 0.161.1 · uv 0.13.5 |
+| Base de datos | PostgreSQL | 18.6 |
+| Infra (dev) | Docker + Docker Compose | docker 29.9.2 · compose 5.6.1 |
+
+> Versiones verificadas el 23/10/2026 con `pnpm view`, `uv`, `docker --version` y
+> `docker compose version`. La SPEC oficial referencia FastAPI 0.158.2 (21/10/2026).
+
+## 7. Restricciones técnicas heredadas de la SPEC de clase
+
+| # | Restricción | Cómo la vamos a cumplir |
+|---|-------------|-------------------------|
+| 1 | Mobile-first con mejora progresiva: base sin media queries; `@media (min-width: …)` solo para agregar o mejorar | CSS base de una columna sin media queries; `min-width: 768px` y `1024px` solo suman (UX-UI §3) |
+| 2 | Paginación de todas las consultas de listado y de sus tablas | Paginación por offset con total (`page`, `page_size`; 20 por defecto, máximo 50) en catálogo, mis aportes, roadmap y panel de validación (TRD TD-002) |
+| 3 | Menú sándwich en mobile | Header con botón hamburguesa y panel lateral por debajo de 1024px, con ARIA (UX-UI §4.5) |
+| 4 | Screaming Architecture | Carpetas por dominio: `identidad`, `categorias`, `cursos`, `aportes`, `roadmap` (TRD §3.2) |
+| 5 | Apariencia y experiencia inspiradas en Google | Tokens concretos: azul `#1a73e8`, sombras sutiles, radios amplios y estados definidos (UX-UI §2) |
+
+> La consigna del docente habla de 4 prácticas, pero la SPEC oficial lista 5 en
+> "Indicaciones técnicas". Se registran las 5.
