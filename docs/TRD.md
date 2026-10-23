@@ -126,3 +126,77 @@ flowchart LR
 - El volumen de PostgreSQL se monta según indica la documentación de la imagen 18 (verificar el punto de montaje al escribir el `docker-compose.yml`).
 
 > En la clase del 27/10 los Dockerfiles evolucionan a multi-stage. Por ahora, lo mínimo que levanta.
+
+
+## 4. Convenciones
+
+- **Commits:** Conventional Commits (`feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `docker`).
+- **Flujo de Git:** GitHub Flow con una rama por documento o tarea, mergeada con `--no-ff`. Detalle completo en [GIT_WORKFLOW.md](GIT_WORKFLOW.md).
+- **Errores de API (TD-003):** toda respuesta de error usa este formato, con `code` estable en mayúsculas:
+
+  ```json
+  {
+    "error": {
+      "code": "VALIDATION_ERROR",
+      "message": "Hay campos inválidos",
+      "details": [
+        { "field": "email", "message": "El email ya está registrado" }
+      ]
+    }
+  }
+  ```
+
+  | Código HTTP | `code` | Cuándo |
+  |-------------|--------|--------|
+  | 401 | `UNAUTHENTICATED` | sin sesión o sesión vencida; credenciales inválidas |
+  | 403 | `FORBIDDEN` | sesión válida sin el rol necesario |
+  | 404 | `NOT_FOUND` | recurso inexistente o no visible para el usuario |
+  | 409 | `CONFLICT` | email o enlace duplicado; curso ya incluido en el roadmap |
+  | 422 | `VALIDATION_ERROR` | datos inválidos |
+  | 429 | `RATE_LIMITED` | login bloqueado; incluye el encabezado `Retry-After` |
+  | 500 | `INTERNAL_ERROR` | error inesperado, sin detalles internos |
+
+- **Variables de entorno** (el repo incluye `.env.example`; el `.env` real no se versiona):
+
+  | Variable | Ejemplo | Obligatoria | Descripción |
+  |----------|---------|-------------|-------------|
+  | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | `aprovecha` / `cambiar` / `aprovechaelbug` | sí | credenciales del contenedor de PostgreSQL |
+  | `DATABASE_URL` | `postgresql+psycopg://aprovecha:cambiar@postgres:5432/aprovechaelbug` | sí | conexión del backend |
+  | `JWT_SECRET` | cadena larga aleatoria | sí | firma del token |
+  | `JWT_EXPIRES_MINUTES` | `60` | no | vida de la sesión |
+  | `COOKIE_SECURE` | `false` | no | `true` en producción (HTTPS) |
+  | `LOGIN_MAX_ATTEMPTS` / `LOGIN_WINDOW_MINUTES` | `5` / `15` | no | rate limiting del login |
+  | `RESET_TOKEN_TTL_MINUTES` | `60` | no | vencimiento del token de recuperación |
+  | `FRONTEND_BASE_URL` | `http://localhost:5173` | sí | base del enlace de restablecimiento |
+  | `MODERADOR_EMAIL` / `MODERADOR_PASSWORD` | datos de prueba | sí | usuario moderador creado por el seed |
+
+- **Logging y excepciones:** `logging` estándar de Python con nivel INFO y formato de una línea (fecha, nivel, módulo, mensaje). Nunca se registran contraseñas ni tokens de sesión; la única excepción deliberada es el enlace de recuperación en desarrollo (TD-006). Las reglas de negocio lanzan excepciones de dominio que un handler global traduce al envelope de errores; cualquier otra excepción se registra con su traza y responde `INTERNAL_ERROR`.
+
+## 5. Requisitos no funcionales técnicos (traducción de las restricciones)
+
+| Restricción | Cómo se cumple | Dónde se verifica |
+|-------------|----------------|-------------------|
+| Paginación de listados | TD-002: `page` y `page_size` en todos los GET de listado | `GET /api/v1/cursos?page=…&page_size=…` y demás listados del BackendSchema |
+| Mobile-first con mejora progresiva | tokens y breakpoints de UX-UI §3, sin media queries en la base | componentes críticos: header, catálogo, formulario de aporte |
+| Menú sándwich | componente de header con panel lateral y ARIA | APPFlow §3 y UX-UI §4.5 |
+| Screaming Architecture | árbol de §3.2 | revisión del repositorio |
+| Apariencia tipo Google | tokens concretos en UX-UI §2 | revisión visual contra UX-UI |
+| bcrypt (RNF-006) | paquete `bcrypt` con costo 12, sin librerías intermedias | test unitario del service de identidad (clase del 27/10) |
+| Rate limiting (BR-009) | TD-005 | test unitario de la función de límite con reloj inyectado |
+| `docker compose up` completo (RNF-009) | §3.3 y TD-007 | verificación en máquina limpia al cierre de la Instancia B |
+
+## 6. Riesgos técnicos
+
+| Riesgo | Probabilidad | Impacto | Mitigación |
+|--------|--------------|---------|------------|
+| El rate limiting en memoria se pierde al reiniciar el backend y no escala a varios procesos | alta | bajo | aceptado en el MVP (un solo proceso); documentado; migrar a tabla o Redis si hubiera varios procesos |
+| El backend ve la IP del contenedor y no la del cliente, y el límite pierde sentido | media | medio | proxy de Vite con `xfwd` y lectura de `X-Forwarded-For`; verificar en la Instancia B |
+| Las migraciones con Alembic llevan más tiempo del estimado | media | medio | primera migración generada desde los modelos; el Plan reserva una tarea específica |
+| Cookie `HttpOnly` con `SameSite=Lax` y falta de protección CSRF explícita | baja | medio | solo se aceptan peticiones JSON, y `SameSite=Lax` bloquea envíos entre sitios con métodos que modifican datos; revisar si se agregan formularios clásicos |
+| El punto de montaje del volumen de PostgreSQL 18 cambió respecto de versiones anteriores | media | bajo | consultar la documentación de la imagen al escribir el `docker-compose.yml`, y probar `down` y `up` conservando datos |
+| El formulario de aporte tiene muchos campos y su validación consume más tiempo | media | medio | un único schema de validación por campo en backend y reglas equivalentes en frontend |
+
+---
+
+**Referencia:**
+- Design Docs at Google: https://www.industrialempathy.com/posts/design-docs-at-google/
