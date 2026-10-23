@@ -1,69 +1,76 @@
-# SPEC — WebApp de Gestión de Comunidad de Cursos
+# SPEC — AprovechaElBug
 
-> **Entregada al alumno el 21/10/2026.**
-> Esta SPEC es **intencionalmente breve e incompleta**: una SPEC de cliente real no llega cerrada.
-> Parte de tu trabajo en el PRD es detectar los vacíos, tomar decisiones y documentarlas.
+> **Qué es este documento:** la versión refinada de la SPEC de clase.
+> El primer commit de este archivo es la SPEC oficial recibida el 21/10/2026, sin modificar.
+> Lo que sigue es su evolución: mismos requisitos, ambigüedades resueltas y decisiones
+> incorporadas, cada una con su origen.
 
-## Producto
+## 1. Identidad del producto
 
-Una webapp donde una comunidad de estudiantes construye **en conjunto** un catálogo de cursos
-gratuitos y gestiona su aprendizaje con **roadmaps personales**.
+- **Nombre propio:** AprovechaElBug
+- **Una línea:** para estudiantes que quieren aprender gratis · catálogo comunitario de
+  cursos gratuitos validados y roadmaps personales de aprendizaje · evita perder tiempo
+  entre ofertas dispersas y de calidad dudosa.
 
-### Funcionalidades principales
+## 2. Problema
 
-1. **Roadmap personal**: cada usuario crea y gestiona su propio roadmap de cursos.
-2. **Aporte de cursos**: el usuario carga cursos gratuitos de cualquier plataforma o proveedor,
-   indicando su enlace web activo y, como mínimo:
-   - categoría / rubro (seleccionado de una lista)
-   - tema
-   - título
-   - versión
-   - año de edición
-   - docentes o disertantes que lo imparten
-   - ¿cuenta con cuestionarios?
-   - ¿requiere examen?
-   - ¿extiende certificado?
-   - ¿lo avala una organización?
-3. **Declaración de toma**: quien aporta un curso declara si él o ella lo tomó o no.
-4. **Catálogo comunitario**: todo curso aportado y **validado** pasa al catálogo comunitario;
-   desde allí, cualquier usuario puede incluirlo en su catálogo / roadmap personal.
-5. **Cuenta de usuario y autenticación**:
-   - registro de usuario;
-   - login;
-   - recuperación de contraseña (ciclo completo: solicitud → enlace/token → nueva contraseña);
-   - protección del **login con rate limiting** (como mínimo en el endpoint de login);
-   - contraseñas cifradas con **bcrypt como mínimo** (se puede elegir un algoritmo más fuerte
-     si se justifica en el TRD).
+Los cursos gratuitos de calidad existen, pero están repartidos entre decenas de plataformas
+(Udemy, Microsoft Learn, Platzi, entre otras) y mezclados con promociones temporales,
+cursos desactualizados o contenido de baja calidad. Quien quiere aprender un tema tiene que
+buscar plataforma por plataforma, sin saber si el curso sigue vigente, si entrega
+certificado, si exige examen o si lo respalda alguna organización.
 
-## Stack tecnológico (fijo)
+Hoy esto se resuelve con listas sueltas en foros o redes, marcadores personales o buscadores
+generales. Ninguna de esas vías valida la información ni ayuda a ordenar el aprendizaje:
+cada persona repite la misma búsqueda y descubre los mismos callejones sin salida.
 
-| Capa         | Tecnología          | Versión                                      |
-| ------------ | ------------------- | -------------------------------------------- |
-| Frontend     | React + Vite + pnpm | React 19 (última stable)                     |
-| Backend      | FastAPI + uv        | última stable (ref. 21/10/2026: `0.158.2`)   |
-| Base de datos | PostgreSQL         | **18.6** (versión actual stable)             |
-| Infra (dev)  | Docker + Compose    | última stable                                |
+Una comunidad cambia la ecuación: cada persona que descubre un curso útil lo aporta una
+sola vez con sus datos concretos (incluyendo si realmente lo tomó) y una validación lo
+deja disponible para todos. El esfuerzo de curar se reparte, y la información mejora con
+cada aporte. Además, un roadmap personal convierte una lista de cursos en un plan de
+aprendizaje con orden y seguimiento.
 
-> Registrá en tu TRD la versión exacta que resuelvas instalar.
+## 3. Visión
 
-## Indicaciones técnicas (buenas prácticas obligatorias)
+En su mejor versión, dentro de 12 meses, AprovechaElBug es el lugar de referencia de la
+comunidad estudiantil para encontrar cursos gratuitos confiables: un catálogo amplio y
+vigente, con información verificada por la comunidad, y roadmaps que los estudiantes
+construyen, siguen y comparten para llegar a un objetivo de aprendizaje concreto.
 
-1. **Mobile-first con mejora progresiva** (*Progressive Enhancement*):
-   estilos base **sin media queries**; a partir de ahí, `@media (min-width: ...)` **únicamente**
-   para agregar o mejorar a medida que la pantalla crece (nunca para “arreglar” lo base).
-2. **Paginación** de todas las consultas de listado y de sus tablas en pantalla.
-3. **Menú sándwich** en mobile.
-4. **Screaming Architecture**: la estructura de carpetas debe comunicar el **dominio del negocio**,
-   no el framework que usás.
-5. **Apariencia y experiencia inspiradas en Google**: estética limpia tipo Material — mucho espacio
-   en blanco, jerarquía tipográfica clara, azul primario de Google, sombras sutiles, bordes
-   redondeados, componentes con estados definidos. La guía visual completa (UX-UI) debe reflejar
-   esa inspiración con valores concretos, no con adjetivos.
+## 4. Alcance
 
-## Fuera de esta SPEC (lo definís vos en la documentación del TP)
+### Dentro
 
-Autenticación y roles · modelo de datos · API · diseño visual · flujos de navegación ·
-plan de tareas · estrategia de testing.
+- Registro, login y cierre de sesión, con contraseñas cifradas con bcrypt.
+- Rate limiting en el endpoint de login.
+- Recuperación de contraseña con ciclo completo: solicitud, token y nueva contraseña.
+- Aporte de cursos gratuitos con enlace activo y todos los datos exigidos por la SPEC.
+- Declaración de si quien aporta tomó el curso.
+- Validación de aportes por un moderador (aprobar o rechazar con motivo).
+- Catálogo comunitario paginado, con búsqueda por texto y filtro por categoría.
+- Roadmap personal: incluir cursos del catálogo, ordenarlos y marcar su avance.
+- Interfaz mobile-first con mejora progresiva, menú sándwich y estética tipo Google.
 
-Especificar es **tomar decisiones con criterio y dejarlas escritas**, no esperar a que alguien
-las tome por vos.
+### Fuera (out of scope explícito)
+
+- Cursos de pago, y cualquier tipo de pasarela o cobro.
+- Alojar o reproducir contenido de los cursos: solo se guarda el enlace externo.
+- Verificación automática de enlaces o extracción (scraping) de datos de las plataformas.
+- Valoraciones, comentarios o foros sobre los cursos.
+- Roadmaps públicos o compartidos entre usuarios.
+- Envío real de correos: en desarrollo el token de recuperación se registra en el log.
+- Gestión de usuarios y roles desde la interfaz: el moderador se crea por seed.
+- Edición de aportes ya enviados, y reenvío de aportes rechazados (se aporta uno nuevo).
+- Inicio de sesión con redes sociales, app móvil nativa, internacionalización.
+
+## 5. Reglas de producto clave
+
+| # | Regla | Origen |
+|---|-------|--------|
+| BR-001 | Un curso aportado entra al sistema "en revisión" y solo llega al catálogo comunitario tras ser validado | SPEC clase ("cursos cargados y **validados** pasan al catálogo") |
+| BR-002 | Quien aporta un curso declara si él o ella lo tomó | SPEC clase |
+| BR-003 | El roadmap es personal: cada usuario ve y edita solo el suyo | decisión propia |
+| BR-004 | Un mismo enlace de curso no puede existir dos veces en el sistema | decisión propia |
+| BR-005 | Solo un usuario con rol moderador valida o rechaza aportes; el rechazo exige un motivo | decisión propia |
+
+> El detalle completo de reglas vive en el PRD §7.
