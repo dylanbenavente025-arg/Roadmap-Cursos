@@ -100,3 +100,29 @@ construyen, siguen y comparten para llegar a un objetivo de aprendizaje concreto
 
 > La consigna del docente habla de 4 prácticas, pero la SPEC oficial lista 5 en
 > "Indicaciones técnicas". Se registran las 5.
+
+
+## 8. Vacíos de la SPEC de clase y decisiones tomadas
+
+| # | Vacío detectado en la SPEC | Opciones consideradas | Decisión | Dónde se desarrolla |
+|---|----------------------------|-----------------------|----------|---------------------|
+| 1 | ¿Quién valida los cursos aportados? | autovalidación comunitaria · validación docente · moderador | Un rol moderador aprueba o rechaza (con motivo) | PRD BR-005 |
+| 2 | ¿Hay roles? | solo usuarios · usuario + moderador · roles configurables | Dos roles: usuario y moderador; el moderador se crea por seed, sin gestión desde la UI | PRD §8 · TRD TD-001 |
+| 3 | ¿Qué es "incluir en mi catálogo / roadmap"? | lista simple · lista con orden y estado de avance | Un solo concepto: ítem de roadmap con orden y estado (pendiente, en curso, completado) | PRD BR-006, BR-007 · TRD TD-004 |
+| 4 | ¿Cómo se busca en el catálogo? | solo texto · solo filtros · ambos | Texto libre (título y tema) y filtro por categoría, combinables | PRD US-007 |
+| 5 | ¿Quién define las categorías? | lista cerrada por seed · alta libre por usuarios | Lista cerrada cargada por seed | BackendSchema §3.5 |
+| 6 | ¿Qué estados tiene un curso aportado? | con borrador · sin borrador | Tres estados: en_revision, publicado, rechazado | BackendSchema §2 |
+| 7 | ¿Qué pasa con un aporte rechazado? | editar y reenviar · definitivo | Queda rechazado con su motivo; para insistir se aporta uno nuevo | PRD §8 |
+| 8 | ¿Qué es un duplicado? | mismo título · mismo enlace | Mismo enlace normalizado, en cualquier estado | PRD BR-004 |
+| 9 | ¿Cómo llega el token de recuperación sin servidor de correo? | SMTP real · MailHog · registro en el log | En desarrollo se registra en el log del backend; token de un solo uso con expiración | PRD BR-008 · TRD TD-006 |
+| 10 | ¿Cómo se aplica el rate limiting del login? | por IP · por email · ambos | Por combinación IP + email, con límite de intentos fallidos en una ventana de tiempo | PRD BR-009 · TRD TD-005 |
+| 11 | ¿Cómo se mantiene la sesión? | JWT · sesión en servidor | JWT de acceso con expiración | TRD TD-001 |
+
+## 9. Historia de la SPEC (autoregistro de cambios)
+
+| Fecha | Cambio | Por qué |
+|-------|--------|---------|
+| 20/10/2026 | SPEC borrador escrita en el aula | — |
+| 21/10/2026 | SPEC oficial recibida; precisa recuperación de contraseña, rate limiting y la versión de FastAPI (0.158.2) | corrección del docente |
+| 23/10/2026 | Primer commit: SPEC oficial tal cual | regla de la consigna |
+| 23/10/2026 | Refinamiento: identidad, alcance, reglas, stack y decisiones sobre vacíos (§1 a §8) | completar lo que la SPEC dejó abierto |
