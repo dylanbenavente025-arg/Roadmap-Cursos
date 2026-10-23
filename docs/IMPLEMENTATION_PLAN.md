@@ -162,3 +162,89 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 7.1 | README con instrucciones de ejecución verificables | incluye requisitos (Docker y Docker Compose), `cp .env.example .env`, `docker compose up`, las URLs (frontend `:5173`, documentación de la API `:8000/docs`), las credenciales del moderador de prueba y cómo reiniciar la base | 30 min |
 | 7.2 | Verificación en máquina limpia | un clon nuevo del repo, siguiendo solo el README, completa el recorrido del §1 sin errores en consola ni en los logs | 1 h |
 | 7.3 | Actualizar la tabla de ejecución (§4) | todas las tareas terminadas están en `[x]` con su rama y commit | 20 min |
+
+
+## 4. Ejecución (Instancia B)
+
+> **Regla:** 1 tarea (o lote coherente) = una rama según el [flujo de Git](GIT_WORKFLOW.md),
+> por ejemplo `feat/m1-registro`, más sus commits convencionales. Esta tabla se actualiza
+> mientras se avanza.
+
+| # | Tarea | Módulo | Estado | Rama / Commit |
+|---|-------|--------|--------|---------------|
+| 0.1 | Estructura de carpetas | M0 | [ ] | |
+| 0.2 | docker-compose con PostgreSQL | M0 | [ ] | |
+| 0.3 | Backend FastAPI mínimo | M0 | [ ] | |
+| 0.4 | SQLAlchemy y Alembic | M0 | [ ] | |
+| 0.5 | Errores y paginación compartidos | M0 | [ ] | |
+| 0.6 | Frontend Vite con rutas y tokens | M0 | [ ] | |
+| 0.7 | Header y menú sándwich | M0 | [ ] | |
+| 0.8 | Dockerfile del frontend y Compose completo | M0 | [ ] | |
+| 1.1 | Migración y modelo `usuarios` | M1 | [ ] | |
+| 1.2 | Service de contraseñas | M1 | [ ] | |
+| 1.3 | `POST /auth/registro` | M1 | [ ] | |
+| 1.4 | Rate limiter en memoria | M1 | [ ] | |
+| 1.5 | `POST /auth/login` | M1 | [ ] | |
+| 1.6 | `GET /auth/me`, logout y dependencias | M1 | [ ] | |
+| 1.7 | Seed del moderador | M1 | [ ] | |
+| 1.8 | Cliente HTTP, sesión y header | M1 | [ ] | |
+| 1.9 | Pantallas Registro y Login | M1 | [ ] | |
+| 2.1 | Migración `categorias` y `cursos` | M2 | [ ] | |
+| 2.2 | Seed de categorías y cursos | M2 | [ ] | |
+| 2.3 | `GET /categorias` | M2 | [ ] | |
+| 2.4 | `GET /cursos` | M2 | [ ] | |
+| 2.5 | `GET /cursos/{id}` | M2 | [ ] | |
+| 2.6 | Componentes compartidos | M2 | [ ] | |
+| 2.7 | Pantalla Catálogo | M2 | [ ] | |
+| 2.8 | Pantalla Detalle | M2 | [ ] | |
+| 3.1 | Normalización de enlaces | M3 | [ ] | |
+| 3.2 | `POST /aportes` | M3 | [ ] | |
+| 3.3 | `GET /aportes/pendientes` | M3 | [ ] | |
+| 3.4 | `POST /aportes/{id}/validar` | M3 | [ ] | |
+| 3.5 | Pantalla Aportar curso | M3 | [ ] | |
+| 3.6 | Pantalla Validación | M3 | [ ] | |
+| 4.1 | Migración `roadmap_items` | M4 | [ ] | |
+| 4.2 | `POST /roadmap/items` | M4 | [ ] | |
+| 4.3 | `GET /roadmap` | M4 | [ ] | |
+| 4.4 | `en_mi_roadmap` en cursos | M4 | [ ] | |
+| 4.5 | Botón "Agregar a mi roadmap" | M4 | [ ] | |
+| 4.6 | Pantalla Mi roadmap | M4 | [ ] | |
+| 7.1 | README de ejecución | M7 | [ ] | |
+| 7.2 | Verificación en máquina limpia | M7 | [ ] | |
+| 7.3 | Actualizar esta tabla | M7 | [ ] | |
+| 5.1 | Búsqueda y filtros (P1) | M5 | [ ] | |
+| 5.2 | `GET /aportes/mios` (P1) | M5 | [ ] | |
+| 5.3 | Pantalla Mis aportes (P1) | M5 | [ ] | |
+| 5.4 | `PATCH` y `mover` del roadmap (P1) | M5 | [ ] | |
+| 5.5 | `DELETE` del roadmap (P1) | M5 | [ ] | |
+| 5.6 | Controles del roadmap (P1) | M5 | [ ] | |
+| 6.1 | Migración `password_reset_tokens` (P1) | M6 | [ ] | |
+| 6.2 | `POST /auth/recuperar` (P1) | M6 | [ ] | |
+| 6.3 | `POST /auth/restablecer` (P1) | M6 | [ ] | |
+| 6.4 | Pantallas de recuperación (P1) | M6 | [ ] | |
+
+## 5. Estrategia de testing
+
+> Se **planifica** acá y se **implementa** en la clase del 27/10.
+
+- **Unit tests (services), patrón AAA, sin base de datos ni HTTP:** hash y validación de contraseñas (1.2), rate limiter con reloj inyectado (1.4), normalización de enlaces (3.1), transiciones de estado del curso y exigencia de motivo al rechazar (3.4), reglas del roadmap (BR-006 y BR-007).
+- **Integration tests (repositories y routers):** contra el PostgreSQL del Compose, con una base de pruebas aparte: unicidad de email y de enlace, paginación con `total`, filtros de estado en el catálogo, aislamiento del roadmap entre usuarios y permisos por rol.
+- **Frontend:** hooks y componentes con Vitest y Testing Library: estados de carga, vacío y error del catálogo, paginador, formulario de aporte con validación en línea.
+- **Objetivo de cobertura:** al menos 85 % en los services del backend.
+
+## 6. Riesgos del plan
+
+| Riesgo | Impacto | Mitigación |
+|--------|---------|------------|
+| El esfuerzo P0 (unas 39 h) es alto para la ventana entre la aprobación y el lunes a las 22:00 | alto | empezar en cuanto llegue el correo APROBADO; avanzar por tajadas verticales que dejen algo verificable cada pocas horas; apoyarse en asistencia para el código repetitivo; M5 y M6 solo si M7 está cerrado |
+| La verificación en máquina limpia se deja para el final y aparece un fallo de entorno | alto | correr `docker compose up` completo desde un clon limpio al terminar M0 y de nuevo al terminar M2; reservar al menos 2 h antes del límite para M7 |
+| Migraciones de Alembic y cambios de modelo bloquean varias tareas | medio | una migración por módulo; no editar migraciones ya aplicadas, crear una nueva |
+| El rate limiting pierde sentido por la IP del contenedor | medio | verificar en 1.5 que el backend recibe `X-Forwarded-For` desde el proxy de Vite (TRD §6) |
+| El formulario de aporte (11 campos) y su validación llevan más de lo estimado | medio | un schema de validación único por campo en el backend; en el frontend reglas simples que repliquen las del BackendSchema §3.3 |
+| El punto de montaje del volumen de PostgreSQL 18 es distinto al de versiones anteriores | bajo | consultar la documentación de la imagen en 0.2 y probar `docker compose down` y `up` conservando los datos |
+
+---
+
+**Referencias:**
+- Atlassian — Plantilla de plan de proyecto: https://www.atlassian.com/software/confluence/templates/project-plan
+- Shape Up — cómo partir trabajo real en scopes cerrables: https://basecamp.com/shapeup/
