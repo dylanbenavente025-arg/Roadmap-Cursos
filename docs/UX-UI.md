@@ -233,3 +233,40 @@ Aplica a: catálogo (grid de cards), mis aportes, panel de validación y mi road
 - **Estado de avance:** `select` nativo con Pendiente, En curso y Completado.
 - **Orden:** botones "Subir" y "Bajar" con `aria-label` que incluye el título del curso. No hay arrastrar y soltar en el MVP, para que sea accesible por teclado.
 - **Quitar:** botón de texto con icono que abre el modal de confirmación (§4.9).
+
+## 5. Layout y navegación
+
+- **Header:** sticky (`--z-header`), fondo `--color-surface`, alto 56 px en la base y 64 px desde 768 px. Base: hamburguesa, logo y zona de sesión compacta. Desde 1024 px: logo, navegación horizontal y acciones de sesión. Aparece `--shadow-1` al hacer scroll.
+- **Contenedor:** ancho máximo 1140 px centrado; padding lateral `--space-4` en la base y `--space-5` desde 768 px.
+- **Pantallas** (el detalle de navegación y estados vive en el [APPFlow](APPFlow.md)): Home, Catálogo, Detalle de curso, Registro, Login, Olvidé mi contraseña, Restablecer contraseña, Aportar curso, Mis aportes, Validación (moderador) y Mi roadmap.
+
+## 6. Accesibilidad mínima (no negociable)
+
+- [x] Texto con contraste AA (≥ 4,5:1): `#202124` 16,10:1, `#5f6368` 6,05:1, links `#1557b0` 6,95:1, error `#d93025` 4,77:1
+- [x] Botón primario con texto blanco sobre `#1a73e8`: 4,51:1
+- [x] Bordes de controles ≥ 3:1: `#80868b` 3,68:1 sobre blanco (el `#dadce0` es solo decorativo)
+- [x] El color nunca es el único indicador: estado, error y selección llevan icono o texto
+- [ ] `:focus-visible` visible en todo elemento interactivo (anillo de 2 px)
+- [ ] Menú sándwich con `aria-expanded`, `aria-controls`, foco atrapado y devuelto al cerrar
+- [ ] Modales con `role="dialog"`, `aria-modal`, foco atrapado y cierre con `ESC`
+- [ ] Errores de formulario asociados al campo con `aria-describedby` y `aria-invalid`
+- [ ] `prefers-reduced-motion: reduce` desactiva el brillo del skeleton y las transiciones
+- [ ] Iconos decorativos con `aria-hidden="true"`; iconos de acción con `aria-label`
+- [ ] Todo se puede operar con teclado, incluido el reordenamiento del roadmap
+
+> Los ítems sin tildar se verifican durante la construcción (Instancia B).
+
+## 7. Iconografía y assets
+
+- **Set:** Material Symbols (el set de Google), servido desde el propio proyecto con el paquete npm `material-symbols`, sin CDN. Se fija la versión en el lockfile.
+- **Por qué:** coincide con la inspiración fijada por la SPEC y evita depender de servicios externos.
+- **Tamaños y color:** 20 px dentro de botones, 24 px en listas y menú; el icono hereda el color del texto.
+- **Imágenes:** sin fotos decorativas. Los estados vacíos usan iconos grandes en `--color-text-muted`.
+- **Fuera de alcance de esta guía:** modo oscuro.
+
+---
+
+**Referencias:**
+- NN/g — Front-End Style-Guides: https://www.nngroup.com/articles/front-end-style-guides/
+- NN/g — Design Systems 101: https://www.nngroup.com/articles/design-systems-101/
+- WebAIM — Contrast Checker: https://webaim.org/resources/contrastchecker/
