@@ -13,9 +13,26 @@
 
 ## Cómo levantar
 
-> En construcción: se completa en el ticket T4.
-
 Requisitos: Git y Docker Desktop (incluye Docker Compose).
+
+```bash
+git clone https://github.com/dylanbenavente025-arg/Roadmap-Cursos.git
+cd Roadmap-Cursos
+cp .env.example .env
+docker compose up --build
+```
+
+| Qué | URL |
+|-----|-----|
+| Frontend | http://localhost:5173 |
+| Backend (health) | http://localhost:8000/health |
+| API del catálogo | http://localhost:8000/api/v1/cursos |
+| Documentación de la API | http://localhost:8000/docs |
+| PostgreSQL | localhost:5432 (credenciales en `.env`) |
+
+- Detener: `Ctrl+C` y luego `docker compose down`. Borrar también la base: `docker compose down -v`.
+- Si un puerto está ocupado, cambiá `POSTGRES_PORT`, `BACKEND_PORT` o `FRONTEND_PORT` en `.env`.
+- Las imágenes copian el código: después de cambiarlo, volvé a correr `docker compose up --build`.
 
 ## Qué hace
 
