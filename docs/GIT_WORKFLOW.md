@@ -30,12 +30,20 @@ flowchart LR
 | `dev` | `main` (una sola vez) | integración: todo lo que entra al próximo release | `main`, en cada release |
 | `feat/T{N}-descripcion-corta` | `dev` | una feature o un ticket | `dev` |
 | `fix/descripcion-corta` | `dev` | una corrección | `dev` |
+| `test/C27-T{N}-descripcion-corta` | `dev` | tests de un ticket de la clase del 27/10 | `dev` |
+| `docker/C27-T{N}-descripcion-corta` | `dev` | contenedores de un ticket de la clase del 27/10 | `dev` |
+| `docs/C27-T{N}-descripcion-corta` | `dev` | documentación de un ticket de la clase del 27/10 | `dev` |
+| `feat/M{n}-descripcion-corta` | `dev` | tareas de un módulo del Implementation Plan | `dev` |
+| `docs/descripcion-corta` | `dev` | documentación que no viene de un ticket | `dev` |
 
 **Reglas:**
 
 - `main` nunca recibe commits directos ni merges de `feat/*` o `fix/*`; solo recibe `dev` en un release.
 - `N` es el número del ticket (por ejemplo `feat/T2-backend-minimo`).
 - Nombres en minúsculas (salvo `T{N}`), con palabras separadas por guiones.
+- El prefijo de la rama coincide con el tipo de commit principal (`test`, `docker`, `docs`, `feat`, `fix`).
+- `C27-T{N}` identifica los tickets de la clase del 27/10, para no confundirlos con los T1 a T5 del scaffold (`feat/T{N}-…`).
+- `M{n}` es el módulo del Implementation Plan (por ejemplo `feat/M2-cursos-bd`).
 
 ## 3. Ciclo de trabajo de un ticket
 
