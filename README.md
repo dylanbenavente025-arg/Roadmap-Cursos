@@ -7,9 +7,15 @@
 
 **Stack:** React 19 + Vite + pnpm · FastAPI + uv · PostgreSQL 18.6 · Docker Compose (dev)
 
-**Autor:** APELLIDO, Nombre — Legajo XXXXX · Materia: Desarrollo de Software, Sección S34, 2026
+**Autor:** Benavente, Dylan — Legajo 29176 · Materia: Desarrollo de Software, Comisión S34, 2026
 
 ---
+
+## Cómo levantar
+
+> En construcción: se completa en el ticket T4.
+
+Requisitos: Git y Docker Desktop (incluye Docker Compose).
 
 ## Qué hace
 
@@ -47,7 +53,5 @@ arma su roadmap personal de aprendizaje.
 
 ## Versionado
 
-- **Flujo de Git:** GitHub Flow. `main` siempre estable; una rama por documento
-  (`docs/<nombre>`) mergeada con `--no-ff`. Detalle en [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).
-- **Convención de commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
-  `refactor:`, `chore:`, `docker:`), incluidos los commits de merge.
+- **Flujo de Git:** rama de integración `dev`; ramas `feat/T{N}-…` y `fix/…` que nacen de `dev` y vuelven a `dev`; `main` solo recibe releases con tag `vX.Y.Z` y su entrada en [CHANGELOG.md](CHANGELOG.md). Detalle en [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).
+- **Convención de commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `chore:`, `docker:`), incluidos merges y releases.
