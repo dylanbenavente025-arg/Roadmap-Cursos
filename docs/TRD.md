@@ -131,7 +131,7 @@ flowchart LR
 ## 4. Convenciones
 
 - **Commits:** Conventional Commits (`feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `docker`).
-- **Flujo de Git:** GitHub Flow con una rama por documento o tarea, mergeada con `--no-ff`. Detalle completo en [GIT_WORKFLOW.md](GIT_WORKFLOW.md).
+- **Flujo de Git:** rama de integración `dev`, ramas `feat/T{N}-…` y `fix/…` que nacen de `dev`, y releases con tag `vX.Y.Z` en `main` (hasta el 23/10 se usó GitHub Flow). Detalle en [GIT_WORKFLOW.md](GIT_WORKFLOW.md).
 - **Errores de API (TD-003):** toda respuesta de error usa este formato, con `code` estable en mayúsculas:
 
   ```json

@@ -3,13 +3,36 @@
 > WebApp de gestión de comunidad de cursos: catálogo comunitario de cursos gratuitos
 > aportados y validados por los usuarios, más roadmaps personales de aprendizaje.
 >
-> **Estado:** Documentación (Instancia A) enviada a aprobación el 23/10/2026. Desarrollo pendiente de aprobación docente.
+> **Estado:** Instancia B en desarrollo — release v0.1.0 (scaffold mínimo).
 
 **Stack:** React 19 + Vite + pnpm · FastAPI + uv · PostgreSQL 18.6 · Docker Compose (dev)
 
-**Autor:** APELLIDO, Nombre — Legajo XXXXX · Materia: Desarrollo de Software, Sección S34, 2026
+**Autor:** Benavente, Dylan — Legajo 29176 · Materia: Desarrollo de Software, Comisión S34, 2026
 
 ---
+
+## Cómo levantar
+
+Requisitos: Git y Docker Desktop (incluye Docker Compose).
+
+```bash
+git clone https://github.com/dylanbenavente025-arg/Roadmap-Cursos.git
+cd Roadmap-Cursos
+cp .env.example .env
+docker compose up --build
+```
+
+| Qué | URL |
+|-----|-----|
+| Frontend | http://localhost:5173 |
+| Backend (health) | http://localhost:8000/health |
+| API del catálogo | http://localhost:8000/api/v1/cursos |
+| Documentación de la API | http://localhost:8000/docs |
+| PostgreSQL | localhost:5432 (credenciales en `.env`) |
+
+- Detener: `Ctrl+C` y luego `docker compose down`. Borrar también la base: `docker compose down -v`.
+- Si un puerto está ocupado, cambiá `POSTGRES_PORT`, `BACKEND_PORT` o `FRONTEND_PORT` en `.env`.
+- Las imágenes copian el código: después de cambiarlo, volvé a correr `docker compose up --build`.
 
 ## Qué hace
 
@@ -41,13 +64,11 @@ arma su roadmap personal de aprendizaje.
 
 | Instancia | Contenido | Estado |
 |-----------|-----------|--------|
-| A — Documentación | repo + 7 documentos | Enviada a aprobación el 23/10/2026 |
-| B — Desarrollo del MVP | ejecución del Implementation Plan | Pendiente de aprobación |
+| A — Documentación | repo + 7 documentos | Aprobada |
+| B — Desarrollo del MVP | ejecución del Implementation Plan | En desarrollo — v0.1.0 publicada el 29/10/2026 |
 | Clase 27/10 | testing, Docker multi-stage, gestión del cambio | Pendiente |
 
 ## Versionado
 
-- **Flujo de Git:** GitHub Flow. `main` siempre estable; una rama por documento
-  (`docs/<nombre>`) mergeada con `--no-ff`. Detalle en [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).
-- **Convención de commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`,
-  `refactor:`, `chore:`, `docker:`), incluidos los commits de merge.
+- **Flujo de Git:** rama de integración `dev`; ramas `feat/T{N}-…` y `fix/…` que nacen de `dev` y vuelven a `dev`; `main` solo recibe releases con tag `vX.Y.Z` y su entrada en [CHANGELOG.md](CHANGELOG.md). Detalle en [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).
+- **Convención de commits:** Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `chore:`, `docker:`), incluidos merges y releases.
