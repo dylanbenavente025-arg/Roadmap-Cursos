@@ -6,6 +6,12 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+### Added
+- Reglas de negocio del curso como funciones puras (validación del aporte, normalización de enlaces, transiciones de estado) con tests unitarios (ticket C27-T1).
+
+### Changed
+- El año de edición de un curso no puede ser futuro (BR-012).
+
 ## [v0.1.0] - 2026-10-29
 
 ### Added
