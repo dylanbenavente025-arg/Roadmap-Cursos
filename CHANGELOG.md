@@ -6,6 +6,8 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [v0.1.0] - 2026-10-29
+
 ### Added
 - Estructura de carpetas por dominio según el TRD §3.2 y `.env.example`.
 - Backend mínimo: FastAPI con `GET /health`, `GET /api/v1/cursos` paginado (datos de ejemplo en memoria), formato uniforme de errores y configuración de SQLAlchemy.
