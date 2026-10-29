@@ -1,0 +1,44 @@
+/* Design tokens — copia de UX-UI §2.4 */
+:root {
+  --color-primary: #1a73e8;
+  --color-primary-dark: #1557b0;
+  --color-primary-container: #e8f0fe;
+  --color-on-primary: #ffffff;
+  --color-surface: #ffffff;
+  --color-background: #f8f9fa;
+  --color-text: #202124;
+  --color-text-muted: #5f6368;
+  --color-border: #dadce0;
+  --color-border-strong: #80868b;
+  --color-hover-grey: #f1f3f4;
+  --color-success: #188038;
+  --color-success-container: #e6f4ea;
+  --color-warning: #f9ab00;
+  --color-warning-container: #fef7e0;
+  --color-error: #d93025;
+  --color-error-container: #fce8e6;
+  --color-snackbar: #323232;
+
+  --font-family-base: "Roboto", system-ui, sans-serif;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 40px; --space-8: 48px;
+
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-button: 20px;
+  --radius-modal: 28px;
+
+  --shadow-1: 0 1px 2px rgba(60, 64, 67, .1), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  --shadow-2: 0 1px 2px rgba(60, 64, 67, .1), 0 2px 6px 2px rgba(60, 64, 67, .15);
+
+  --z-header: 100;
+  --z-drawer: 200;
+  --z-modal: 250;
+  --z-toast: 300;
+}
