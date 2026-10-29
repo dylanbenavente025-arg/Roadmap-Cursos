@@ -125,6 +125,7 @@ usuario arma su roadmap personal de aprendizaje, con orden y seguimiento de avan
 | BR-009 | Máximo 5 intentos fallidos de login en 15 minutos por combinación IP + email; luego se bloquea hasta que pase la ventana | SPEC clase (rate limit) + decisión propia |
 | BR-010 | Las contraseñas se guardan cifradas con bcrypt y tienen entre 8 y 72 caracteres (72 es el límite de bcrypt) | SPEC clase + decisión propia |
 | BR-011 | El email es único, sin distinguir mayúsculas | decisión propia |
+| BR-012 | El año de edición de un curso está entre 1990 y el año en curso: no puede ser futuro | decisión propia (clase 27/10) |
 
 ## 8. Fuera de alcance (out of scope)
 
