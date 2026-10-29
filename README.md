@@ -3,7 +3,7 @@
 > WebApp de gestión de comunidad de cursos: catálogo comunitario de cursos gratuitos
 > aportados y validados por los usuarios, más roadmaps personales de aprendizaje.
 >
-> **Estado:** Documentación (Instancia A) enviada a aprobación el 23/10/2026. Desarrollo pendiente de aprobación docente.
+> **Estado:** Instancia B en desarrollo — release v0.1.0 (scaffold mínimo).
 
 **Stack:** React 19 + Vite + pnpm · FastAPI + uv · PostgreSQL 18.6 · Docker Compose (dev)
 
@@ -64,8 +64,8 @@ arma su roadmap personal de aprendizaje.
 
 | Instancia | Contenido | Estado |
 |-----------|-----------|--------|
-| A — Documentación | repo + 7 documentos | Enviada a aprobación el 23/10/2026 |
-| B — Desarrollo del MVP | ejecución del Implementation Plan | Pendiente de aprobación |
+| A — Documentación | repo + 7 documentos | Aprobada |
+| B — Desarrollo del MVP | ejecución del Implementation Plan | En desarrollo — v0.1.0 publicada el 29/10/2026 |
 | Clase 27/10 | testing, Docker multi-stage, gestión del cambio | Pendiente |
 
 ## Versionado

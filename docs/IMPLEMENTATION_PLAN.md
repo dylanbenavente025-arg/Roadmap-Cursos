@@ -169,16 +169,14 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 > **Regla:** 1 tarea (o lote coherente) = una rama `feat/T{N}-descripcion-corta` que nace de `dev`
 > según el [flujo de Git](GIT_WORKFLOW.md), más sus commits convencionales. Esta tabla se actualiza mientras se avanza.
 
-| # | Tarea | Módulo | Estado | Rama / Commit |
-|---|-------|--------|--------|---------------|
-| 0.1 | Estructura de carpetas | M0 | [ ] | |
-| 0.2 | docker-compose con PostgreSQL | M0 | [ ] | |
-| 0.3 | Backend FastAPI mínimo | M0 | [ ] | |
-| 0.4 | SQLAlchemy y Alembic | M0 | [ ] | |
-| 0.5 | Errores y paginación compartidos | M0 | [ ] | |
-| 0.6 | Frontend Vite con rutas y tokens | M0 | [ ] | |
-| 0.7 | Header y menú sándwich | M0 | [ ] | |
-| 0.8 | Dockerfile del frontend y Compose completo | M0 | [ ] | |
+| 0.1 | Estructura de carpetas | M0 | [x] | feat/T1-scaffold-estructura · 22e6feb |
+| 0.2 | docker-compose con PostgreSQL | M0 | [ ] | parcial: compose, volumen y `.env.example` en feat/T4-docker-compose-dev · 13dd39b; falta el healthcheck (postergado por el ticket del 27/10) |
+| 0.3 | Backend FastAPI mínimo | M0 | [x] | feat/T2-backend-minimo · 5958d47 |
+| 0.4 | SQLAlchemy y Alembic | M0 | [ ] | parcial: engine de SQLAlchemy en feat/T2-backend-minimo · 5958d47; falta Alembic |
+| 0.5 | Errores y paginación compartidos | M0 | [x] | feat/T2-backend-minimo · 5958d47 |
+| 0.6 | Frontend Vite con rutas y tokens | M0 | [ ] | parcial: Vite, proxy, tokens y pantalla de catálogo en feat/T3-frontend-minimo · bc71201; faltan las rutas del APPFlow |
+| 0.7 | Header y menú sándwich | M0 | [ ] | parcial: header sticky en feat/T3-frontend-minimo · bc71201; falta el menú sándwich |
+| 0.8 | Dockerfile del frontend y Compose completo | M0 | [x] | feat/T4-docker-compose-dev · 13dd39b |
 | 1.1 | Migración y modelo `usuarios` | M1 | [ ] | |
 | 1.2 | Service de contraseñas | M1 | [ ] | |
 | 1.3 | `POST /auth/registro` | M1 | [ ] | |
@@ -191,7 +189,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 2.1 | Migración `categorias` y `cursos` | M2 | [ ] | |
 | 2.2 | Seed de categorías y cursos | M2 | [ ] | |
 | 2.3 | `GET /categorias` | M2 | [ ] | |
-| 2.4 | `GET /cursos` | M2 | [ ] | |
+| 2.4 | `GET /cursos` | M2 | [ ] | parcial: endpoint paginado con datos en memoria en feat/T2-backend-minimo · 5958d47; falta leer de PostgreSQL |
 | 2.5 | `GET /cursos/{id}` | M2 | [ ] | |
 | 2.6 | Componentes compartidos | M2 | [ ] | |
 | 2.7 | Pantalla Catálogo | M2 | [ ] | |
