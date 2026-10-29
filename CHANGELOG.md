@@ -8,6 +8,7 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Added
 - Estructura de carpetas por dominio según el TRD §3.2 y `.env.example`.
+- Backend mínimo: FastAPI con `GET /health`, `GET /api/v1/cursos` paginado (datos de ejemplo en memoria), formato uniforme de errores y configuración de SQLAlchemy.
 
 ### Changed
 - Flujo de Git: de GitHub Flow a rama de integración `dev` con releases versionadas en `main` (ver `docs/GIT_WORKFLOW.md`).
