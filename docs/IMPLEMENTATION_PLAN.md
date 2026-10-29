@@ -166,9 +166,8 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 
 ## 4. Ejecución (Instancia B)
 
-> **Regla:** 1 tarea (o lote coherente) = una rama según el [flujo de Git](GIT_WORKFLOW.md),
-> por ejemplo `feat/m1-registro`, más sus commits convencionales. Esta tabla se actualiza
-> mientras se avanza.
+> **Regla:** 1 tarea (o lote coherente) = una rama `feat/T{N}-descripcion-corta` que nace de `dev`
+> según el [flujo de Git](GIT_WORKFLOW.md), más sus commits convencionales. Esta tabla se actualiza mientras se avanza.
 
 | # | Tarea | Módulo | Estado | Rama / Commit |
 |---|-------|--------|--------|---------------|
