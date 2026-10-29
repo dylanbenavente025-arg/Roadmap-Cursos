@@ -8,6 +8,7 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 
 ### Added
 - Reglas de negocio del curso como funciones puras (validación del aporte, normalización de enlaces, transiciones de estado) con tests unitarios (ticket C27-T1).
+- Reglas del roadmap personal como funciones puras (agregar solo cursos publicados y sin repetir, reordenar, quitar y cambiar el avance) con tests unitarios (ticket C27-T2).
 
 ### Changed
 - El año de edición de un curso no puede ser futuro (BR-012).
