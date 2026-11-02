@@ -170,7 +170,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 > según el [flujo de Git](GIT_WORKFLOW.md), más sus commits convencionales. Esta tabla se actualiza mientras se avanza.
 
 | 0.1 | Estructura de carpetas | M0 | [x] | feat/T1-scaffold-estructura · 22e6feb |
-| 0.2 | docker-compose con PostgreSQL | M0 | [ ] | parcial: compose, volumen y `.env.example` en feat/T4-docker-compose-dev · 13dd39b; falta el healthcheck (postergado por el ticket del 27/10) |
+| 0.2 | docker-compose con PostgreSQL | M0 | [x] | feat/T4-docker-compose-dev · 13dd39b + docker/C27-T10-compose-healthchecks (healthcheck) |
 | 0.3 | Backend FastAPI mínimo | M0 | [x] | feat/T2-backend-minimo · 5958d47 |
 | 0.4 | SQLAlchemy y Alembic | M0 | [ ] | parcial: engine de SQLAlchemy en feat/T2-backend-minimo · 5958d47; falta Alembic |
 | 0.5 | Errores y paginación compartidos | M0 | [x] | feat/T2-backend-minimo · 5958d47 |

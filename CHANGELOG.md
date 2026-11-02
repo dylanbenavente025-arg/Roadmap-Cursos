@@ -13,6 +13,7 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 - Dockerfile multi-stage del backend sobre `python:3.13-alpine`, con usuario no-root y healthcheck contra `/health` (ticket C27-T7).
 - `.dockerignore` del backend y del frontend: el contexto de build excluye dependencias locales, cachés, tests y secretos (ticket C27-T8).
 - Dockerfile multi-stage del frontend: build con `node:22-alpine` y runtime `nginx:alpine-slim`, con fallback de SPA, proxy de `/api/`, caché de assets y cabeceras de seguridad (ticket C27-T9). 
+- Healthcheck de PostgreSQL con `pg_isready` y arranque en cascada en Docker Compose: cada servicio espera a que el anterior esté healthy (ticket C27-T10).
 
 ### Changed
 - El año de edición de un curso no puede ser futuro (BR-012).
