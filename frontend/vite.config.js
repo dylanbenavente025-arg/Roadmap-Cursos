@@ -16,4 +16,8 @@ export default defineConfig({
       '/api': { target: apiTarget, xfwd: true },
     },
   },
+  // Vitest: los tests corren en jsdom, un navegador simulado dentro de Node
+  test: {
+    environment: 'jsdom',
+  },
 })
