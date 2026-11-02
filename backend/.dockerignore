@@ -1,0 +1,20 @@
+# Fuera del contexto de build del backend: no hacen falta para construir la imagen.
+
+# Control de versiones
+.git
+
+# Entorno virtual y cachés de Python de tu máquina
+.venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+
+# Tests y reportes de cobertura (la imagen no corre tests)
+tests/
+.pytest_cache
+.coverage
+htmlcov
+
+# Secretos
+.env
+.env.*
