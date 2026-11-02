@@ -226,7 +226,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 
 - **Unit tests (services), patrón AAA, sin base de datos ni HTTP:** hash y validación de contraseñas (1.2), rate limiter con reloj inyectado (1.4), normalización de enlaces (3.1), transiciones de estado del curso y exigencia de motivo al rechazar (3.4), reglas del roadmap (BR-006 y BR-007).
 - **Integration tests (repositories y routers):** contra el PostgreSQL del Compose, en la base `aprovechaelbug_test` (TRD TD-008), con cada test dentro de una transacción que se deshace. Antes de correrlos: `docker compose up -d postgres --wait`. Implementados para el `CursoRepository`, el endpoint `GET /api/v1/cursos` y el seed (ticket C27-T4).
-- **Frontend:** hooks y componentes con Vitest y Testing Library: estados de carga, vacío y error del catálogo, paginador, formulario de aporte con validación en línea.
+- **Frontend:** tests del hook `useCursos` con Vitest y Testing Library en jsdom, con la API simulada (`vi.mock`): carga inicial, error de red, paginación, filtros y `refetch` (ticket C27-T6). Se ejecutan con `pnpm test` dentro de `frontend`. Pendiente: tests de componentes (paginador, formulario de aporte).
 - **Objetivo de cobertura:** al menos 85 % en los services del backend.
 
 ## 6. Riesgos del plan

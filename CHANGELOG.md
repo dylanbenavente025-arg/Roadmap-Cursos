@@ -17,6 +17,7 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 - Modelos de SQLAlchemy para `usuarios`, `categorias` y `cursos`, `CursoRepository` con paginación y filtros, y datos iniciales (ticket C27-T4).
 - `GET /api/v1/cursos` acepta los filtros `q` (título y tema) y `categoria`.
 - Tests de integración contra PostgreSQL del repository, del endpoint del catálogo y del seed (ticket C27-T4).
+- `useCursos` soporta paginación (`setPage`), filtros (`setFiltros`, que vuelve a la página 1) y `refetch`, con tests de Vitest y Testing Library (ticket C27-T6).
 
 ### Changed
 - El año de edición de un curso no puede ser futuro (BR-012).
