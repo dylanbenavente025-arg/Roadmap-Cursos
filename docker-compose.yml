@@ -20,11 +20,9 @@ services:
 
   frontend:
     build: ./frontend
-    environment:
-      # Dentro de la red de Compose el backend se llama "backend"
-      API_PROXY_TARGET: http://backend:8000
     ports:
-      - "${FRONTEND_PORT:-5173}:5173"
+      # nginx escucha en el 80 dentro del contenedor; se publica en el mismo puerto de siempre
+      - "${FRONTEND_PORT:-5173}:80"
     depends_on:
       - backend
 

@@ -112,12 +112,16 @@ Los módulos `categorias`, `cursos`, `aportes` y `roadmap` repiten la estructura
 |----------|---------------|--------|-----|
 | postgres | postgres:18.6 | 5432 | base de datos, con volumen y healthcheck |
 | backend | python:3.13-alpine + uv, multi-stage (builder → runtime), usuario no-root | 8000 | API FastAPI; healthcheck contra `/health` |
-| frontend | node:22-alpine + pnpm | 5173 | SPA Vite (servidor de desarrollo) |
+| frontend | nginx:alpine-slim, multi-stage (builder `node:22-alpine` + pnpm → runtime nginx) | 80 (publicado en 5173) | sirve el build de Vite, proxy de `/api/` al backend, caché de assets y cabeceras de seguridad |
 
 > **Cambio del 02/11/2026 (ticket C27-T7):** la imagen del backend pasa de `python:3.13-slim` a
 > `python:3.13-alpine` en dos etapas, para cumplir el objetivo de menos de 100 MB (la base slim
 > sola ronda los 120 MB). Los extras de `uvicorn[standard]` quedan solo en el grupo de desarrollo:
 > no son necesarios para correr la API y suman unos 23 MB.
+> **Cambio del 02/11/2026 (ticket C27-T9):** en Compose, el frontend deja de correr el servidor de
+> desarrollo de Vite y pasa a servir el build con nginx (`frontend/nginx.conf`). Se usa
+> `nginx:alpine-slim` porque `nginx:alpine` supera el objetivo de 30 MB. Para desarrollar con
+> recarga automática se sigue usando `pnpm dev` en la máquina local.
 
 ```mermaid
 flowchart LR
