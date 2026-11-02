@@ -32,6 +32,7 @@ Versiones verificadas el 23/10/2026 (ver [SPEC §6](SPEC.md)).
 | TD-005 | Rate limiting del login (BR-009) | `slowapi` · tabla en PostgreSQL · Redis · implementación propia en memoria | Implementación propia en memoria: contador de fallos por clave `IP + email` en ventana deslizante de 15 min, máximo 5; responde 429 con `Retry-After` | Un solo proceso en desarrollo, sin servicios nuevos, y la lógica queda como función pura con reloj inyectable, testeable el 27/10. Se pierde al reiniciar el backend (riesgo aceptado, ver §6) |
 | TD-006 | Recuperación de contraseña (BR-008) | SMTP real · MailHog · registro en el log | Token aleatorio (`secrets.token_urlsafe(32)`); se guarda solo su hash SHA-256 con vencimiento a 1 h y marca de uso. El enlace de restablecimiento se escribe en el log del backend | Sin servidor de correo en desarrollo. Guardar solo el hash evita que una filtración de la base entregue tokens usables |
 | TD-007 | Datos iniciales | cargar a mano · migración de datos · script de seed | Script `seed` idempotente que crea categorías, el moderador (credenciales desde variables de entorno) y cursos de prueba para el catálogo | Reproducible en una máquina limpia (RNF-009) y permite medir RNF-007 con datos |
+| TD-008 | Base de datos de los tests de integración | SQLite en memoria · PostgreSQL del docker-compose | PostgreSQL del Compose, en una base aparte (`aprovechaelbug_test`) que se crea sola; cada test corre en una transacción que se deshace al final | La app usa tipos `ENUM`, índices parciales, `IDENTITY` e `ILIKE`, que SQLite no tiene o imita distinto: un test que pasa en SQLite puede fallar en producción. El costo es tener PostgreSQL levantado (`docker compose up -d postgres --wait`) |
 
 
 ## 3. Arquitectura
@@ -220,7 +221,7 @@ flowchart LR
 | Cookie `HttpOnly` con `SameSite=Lax` y falta de protección CSRF explícita | baja | medio | solo se aceptan peticiones JSON, y `SameSite=Lax` bloquea envíos entre sitios con métodos que modifican datos; revisar si se agregan formularios clásicos |
 | El punto de montaje del volumen de PostgreSQL 18 cambió respecto de versiones anteriores | media | bajo | consultar la documentación de la imagen al escribir el `docker-compose.yml`, y probar `down` y `up` conservando datos |
 | El formulario de aporte tiene muchos campos y su validación consume más tiempo | media | medio | un único schema de validación por campo en backend y reglas equivalentes en frontend |
-
+| Las tablas se crean con `create_all` al arrancar, que no aplica cambios sobre tablas existentes | alta | medio | solución temporal hasta las migraciones con Alembic (tarea 0.4); mientras tanto, ante un cambio de modelo, `docker compose down -v` recrea la base |
 ---
 
 **Referencia:**
