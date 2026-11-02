@@ -194,7 +194,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 2.6 | Componentes compartidos | M2 | [ ] | |
 | 2.7 | Pantalla Catálogo | M2 | [ ] | |
 | 2.8 | Pantalla Detalle | M2 | [ ] | |
-| 3.1 | Normalización de enlaces | M3 | [ ] | |
+| 3.1 | Normalización de enlaces | M3 | [x] | test/C27-T1-reglas-curso (`normalizar_url`, con tests) |
 | 3.2 | `POST /aportes` | M3 | [ ] | |
 | 3.3 | `GET /aportes/pendientes` | M3 | [ ] | |
 | 3.4 | `POST /aportes/{id}/validar` | M3 | [ ] | |
@@ -239,6 +239,15 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | El rate limiting pierde sentido por la IP del contenedor | medio | verificar en 1.5 que el backend recibe `X-Forwarded-For` desde el proxy de Vite (TRD §6) |
 | El formulario de aporte (11 campos) y su validación llevan más de lo estimado | medio | un schema de validación único por campo en el backend; en el frontend reglas simples que repliquen las del BackendSchema §3.3 |
 | El punto de montaje del volumen de PostgreSQL 18 es distinto al de versiones anteriores | bajo | consultar la documentación de la imagen en 0.2 y probar `docker compose down` y `up` conservando los datos |
+| C27-T5 depende del login, que todavía no existe | medio | las reglas de validación y permisos ya están probadas (C27-T3); al terminar M1 y M3, el test de integración reutiliza las fixtures de `conftest.py` |
+
+## 7. Lecciones del ciclo de la clase del 27/10
+
+- **Primero las reglas puras, después la persistencia.** Escribir las reglas de curso, roadmap y validación como funciones puras (C27-T1 a T3) permitió probarlas sin base de datos ni HTTP; los services de M3 y M4 las van a reusar en lugar de reimplementarlas.
+- **Los tests de integración necesitan el entorno levantado.** Corren contra el PostgreSQL del Compose (TRD TD-008): antes de `uv run pytest` hace falta `docker compose up -d postgres --wait`. Cada test corre en una transacción que se deshace, así que no dejan datos.
+- **Las imágenes de los tickets se adaptan al proyecto.** Con `python:slim` y `nginx:alpine` no se cumplen los objetivos de tamaño; se midió con `docker history` y se pasó a `alpine` y `alpine-slim`.
+- **`depends_on` sin healthcheck no alcanza.** El backend crea las tablas al arrancar: sin `condition: service_healthy` podría arrancar antes de que PostgreSQL acepte conexiones.
+- **Pendiente para el próximo ciclo:** C27-T5 (tests de integración del flujo aporte → validación) se hace cuando estén las tareas 1.1 a 1.9 (identidad) y 3.2 a 3.4 (endpoints de aportes); las reglas que va a usar ya están probadas (C27-T1 y C27-T3).
 
 ---
 
