@@ -11,11 +11,13 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 - Reglas del roadmap personal como funciones puras (agregar solo cursos publicados y sin repetir, reordenar, quitar y cambiar el avance) con tests unitarios (ticket C27-T2).
 - Reglas de validación de aportes como funciones puras (solo el moderador valida, solo aportes en revisión, motivo obligatorio al rechazar) con tests unitarios (ticket C27-T3).
 - Dockerfile multi-stage del backend sobre `python:3.13-alpine`, con usuario no-root y healthcheck contra `/health` (ticket C27-T7).
-- `.dockerignore` del backend y del frontend: el contexto de build excluye dependencias locales, cachés, tests y secretos (ticket C27-T8). 
+- `.dockerignore` del backend y del frontend: el contexto de build excluye dependencias locales, cachés, tests y secretos (ticket C27-T8).
+- Dockerfile multi-stage del frontend: build con `node:22-alpine` y runtime `nginx:alpine-slim`, con fallback de SPA, proxy de `/api/`, caché de assets y cabeceras de seguridad (ticket C27-T9). 
 
 ### Changed
 - El año de edición de un curso no puede ser futuro (BR-012).
 - `uvicorn[standard]` pasa a ser dependencia de desarrollo; la imagen usa `uvicorn` sin extras.
+- En Docker Compose, el frontend se sirve con nginx en lugar del servidor de desarrollo de Vite.
 
 ## [v0.1.0] - 2026-10-29
 
