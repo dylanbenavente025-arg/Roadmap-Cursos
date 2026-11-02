@@ -1,14 +1,17 @@
 """Contratos de salida del catálogo (BackendSchema §3.2)."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CategoriaOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     nombre: str
 
 
 class CursoOut(BaseModel):
+    # from_attributes: se puede armar directo desde un objeto Curso de SQLAlchemy
+    model_config = ConfigDict(from_attributes=True)
     id: int
     url: str
     titulo: str

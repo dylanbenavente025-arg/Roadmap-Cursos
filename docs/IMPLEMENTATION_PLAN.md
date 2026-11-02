@@ -186,10 +186,10 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 1.7 | Seed del moderador | M1 | [ ] | |
 | 1.8 | Cliente HTTP, sesión y header | M1 | [ ] | |
 | 1.9 | Pantallas Registro y Login | M1 | [ ] | |
-| 2.1 | Migración `categorias` y `cursos` | M2 | [ ] | |
-| 2.2 | Seed de categorías y cursos | M2 | [ ] | |
+| 2.1 | Migración `categorias` y `cursos` | M2 | [ ] | parcial: modelos con índices y constraints en test/C27-T4-repository-cursos (tablas con create_all); falta la migración con Alembic |
+| 2.2 | Seed de categorías y cursos | M2 | [ ] | parcial: seed idempotente con categorías y 3 cursos en test/C27-T4-repository-cursos; faltan el moderador con credenciales y la opción de 1.000 cursos |
 | 2.3 | `GET /categorias` | M2 | [ ] | |
-| 2.4 | `GET /cursos` | M2 | [ ] | parcial: endpoint paginado con datos en memoria en feat/T2-backend-minimo · 5958d47; falta leer de PostgreSQL |
+| 2.4 | `GET /cursos` | M2 | [x] | test/C27-T4-repository-cursos (lee de PostgreSQL, solo publicados, paginado) |
 | 2.5 | `GET /cursos/{id}` | M2 | [ ] | |
 | 2.6 | Componentes compartidos | M2 | [ ] | |
 | 2.7 | Pantalla Catálogo | M2 | [ ] | |
@@ -209,7 +209,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 7.1 | README de ejecución | M7 | [ ] | |
 | 7.2 | Verificación en máquina limpia | M7 | [ ] | |
 | 7.3 | Actualizar esta tabla | M7 | [ ] | |
-| 5.1 | Búsqueda y filtros (P1) | M5 | [ ] | |
+| 5.1 | Búsqueda y filtros (P1) | M5 | [ ] | parcial: `q` y `categoria` en `GET /cursos` en test/C27-T4-repository-cursos; falta la búsqueda en la pantalla |
 | 5.2 | `GET /aportes/mios` (P1) | M5 | [ ] | |
 | 5.3 | Pantalla Mis aportes (P1) | M5 | [ ] | |
 | 5.4 | `PATCH` y `mover` del roadmap (P1) | M5 | [ ] | |
@@ -225,7 +225,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 > Se **planifica** acá y se **implementa** en la clase del 27/10.
 
 - **Unit tests (services), patrón AAA, sin base de datos ni HTTP:** hash y validación de contraseñas (1.2), rate limiter con reloj inyectado (1.4), normalización de enlaces (3.1), transiciones de estado del curso y exigencia de motivo al rechazar (3.4), reglas del roadmap (BR-006 y BR-007).
-- **Integration tests (repositories y routers):** contra el PostgreSQL del Compose, con una base de pruebas aparte: unicidad de email y de enlace, paginación con `total`, filtros de estado en el catálogo, aislamiento del roadmap entre usuarios y permisos por rol.
+- **Integration tests (repositories y routers):** contra el PostgreSQL del Compose, en la base `aprovechaelbug_test` (TRD TD-008), con cada test dentro de una transacción que se deshace. Antes de correrlos: `docker compose up -d postgres --wait`. Implementados para el `CursoRepository`, el endpoint `GET /api/v1/cursos` y el seed (ticket C27-T4).
 - **Frontend:** hooks y componentes con Vitest y Testing Library: estados de carga, vacío y error del catálogo, paginador, formulario de aporte con validación en línea.
 - **Objetivo de cobertura:** al menos 85 % en los services del backend.
 

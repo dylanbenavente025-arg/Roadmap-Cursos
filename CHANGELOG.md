@@ -14,11 +14,15 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 - `.dockerignore` del backend y del frontend: el contexto de build excluye dependencias locales, cachés, tests y secretos (ticket C27-T8).
 - Dockerfile multi-stage del frontend: build con `node:22-alpine` y runtime `nginx:alpine-slim`, con fallback de SPA, proxy de `/api/`, caché de assets y cabeceras de seguridad (ticket C27-T9). 
 - Healthcheck de PostgreSQL con `pg_isready` y arranque en cascada en Docker Compose: cada servicio espera a que el anterior esté healthy (ticket C27-T10).
+- Modelos de SQLAlchemy para `usuarios`, `categorias` y `cursos`, `CursoRepository` con paginación y filtros, y datos iniciales (ticket C27-T4).
+- `GET /api/v1/cursos` acepta los filtros `q` (título y tema) y `categoria`.
+- Tests de integración contra PostgreSQL del repository, del endpoint del catálogo y del seed (ticket C27-T4).
 
 ### Changed
 - El año de edición de un curso no puede ser futuro (BR-012).
 - `uvicorn[standard]` pasa a ser dependencia de desarrollo; la imagen usa `uvicorn` sin extras.
 - En Docker Compose, el frontend se sirve con nginx en lugar del servidor de desarrollo de Vite.
+- El catálogo se lee de PostgreSQL en lugar de una lista en memoria; el backend crea las tablas y carga los datos iniciales al arrancar.
 
 ## [v0.1.0] - 2026-10-29
 
