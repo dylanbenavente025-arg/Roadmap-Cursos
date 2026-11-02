@@ -156,6 +156,18 @@ flowchart LR
   | 429 | `RATE_LIMITED` | login bloqueado; incluye el encabezado `Retry-After` |
   | 500 | `INTERNAL_ERROR` | error inesperado, sin detalles internos |
 
+  - **Códigos de error del dominio:** las reglas de negocio lanzan `ErrorDeNegocio` (`backend/app/excepciones.py`) con un `code` estable. **Los tests y el frontend dependen del `code`, nunca del texto del mensaje**: el mensaje está escrito para personas y se puede reescribir sin romper nada, mientras que el `code` es parte del contrato de la API. El handler HTTP traduce cada código así:
+
+  | `code` del dominio | HTTP | Cuándo |
+  |--------------------|------|--------|
+  | `CAMPO_OBLIGATORIO`, `TEXTO_DEMASIADO_LARGO`, `URL_INVALIDA`, `ANIO_FUERA_DE_RANGO`, `ANIO_FUTURO`, `DECLARACION_OBLIGATORIA` | 422 | datos del aporte inválidos (van en `details`, uno por campo) |
+  | `MOTIVO_OBLIGATORIO`, `MOTIVO_DEMASIADO_LARGO` | 422 | rechazo sin motivo o con motivo demasiado largo |
+  | `URL_DUPLICADA` | 409 | el enlace ya fue aportado (BR-004) |
+  | `APORTE_YA_DECIDIDO`, `TRANSICION_INVALIDA` | 409 | el aporte ya fue aprobado o rechazado |
+  | `CURSO_YA_INCLUIDO` | 409 | el curso ya está en el roadmap (BR-007) |
+  | `PERMISO_DENEGADO` | 403 | el usuario no tiene el rol necesario (BR-005) |
+  | `CURSO_NO_ENCONTRADO`, `CURSO_NO_PUBLICADO`, `CURSO_NO_EN_ROADMAP` | 404 | el curso no existe, no está publicado o no está en el roadmap |
+
 - **Variables de entorno** (el repo incluye `.env.example`; el `.env` real no se versiona):
 
   | Variable | Ejemplo | Obligatoria | Descripción |
