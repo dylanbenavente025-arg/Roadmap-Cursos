@@ -110,7 +110,7 @@ Los módulos `categorias`, `cursos`, `aportes` y `roadmap` repiten la estructura
 
 | Servicio | Imagen / base | Puerto | Rol |
 |----------|---------------|--------|-----|
-| postgres | postgres:18.6 | 5432 | base de datos, con volumen y healthcheck |
+| postgres | postgres:18.6 | 5432 | base de datos, con volumen `pgdata` y healthcheck `pg_isready` |
 | backend | python:3.13-alpine + uv, multi-stage (builder → runtime), usuario no-root | 8000 | API FastAPI; healthcheck contra `/health` |
 | frontend | nginx:alpine-slim, multi-stage (builder `node:22-alpine` + pnpm → runtime nginx) | 80 (publicado en 5173) | sirve el build de Vite, proxy de `/api/` al backend, caché de assets y cabeceras de seguridad |
 
@@ -122,6 +122,10 @@ Los módulos `categorias`, `cursos`, `aportes` y `roadmap` repiten la estructura
 > desarrollo de Vite y pasa a servir el build con nginx (`frontend/nginx.conf`). Se usa
 > `nginx:alpine-slim` porque `nginx:alpine` supera el objetivo de 30 MB. Para desarrollar con
 > recarga automática se sigue usando `pnpm dev` en la máquina local.
+> **Cambio del 02/11/2026 (ticket C27-T10):** los servicios arrancan en cascada con
+> `depends_on: condition: service_healthy` (postgres → backend → frontend). Los healthchecks del
+> backend y del frontend están en sus Dockerfiles; el de postgres, en el Compose, porque se usa la
+> imagen oficial sin modificar. `docker compose up --build -d --wait` termina cuando los tres están healthy.
 
 ```mermaid
 flowchart LR

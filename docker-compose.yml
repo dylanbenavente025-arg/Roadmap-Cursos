@@ -1,5 +1,5 @@
-# Entorno de desarrollo de AprovechaElBug (TRD §3.3).
-# Simple a propósito: sin healthchecks, sin multi-stage, sin optimización de imágenes.
+# Entorno de AprovechaElBug con Docker Compose (TRD §3.3).
+# Cada servicio arranca recién cuando el que necesita está "healthy" (ticket C27-T10).
 services:
   postgres:
     image: postgres:18.6
@@ -9,22 +9,34 @@ services:
     volumes:
       # Desde PostgreSQL 18 el volumen se monta en /var/lib/postgresql (no en .../data)
       - pgdata:/var/lib/postgresql
+    healthcheck:
+      # -h 127.0.0.1: mientras se inicializa, PostgreSQL solo escucha por socket local.
+      # Preguntando por TCP, recién responde "listo" cuando acepta conexiones de verdad.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   backend:
     build: ./backend
     env_file: .env
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    # Healthcheck propio: GET /health, definido en backend/Dockerfile
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
     ports:
       # nginx escucha en el 80 dentro del contenedor; se publica en el mismo puerto de siempre
       - "${FRONTEND_PORT:-5173}:80"
+    # Healthcheck propio: GET /health de nginx, definido en frontend/Dockerfile
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   pgdata:
