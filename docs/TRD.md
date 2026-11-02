@@ -111,8 +111,13 @@ Los módulos `categorias`, `cursos`, `aportes` y `roadmap` repiten la estructura
 | Servicio | Imagen / base | Puerto | Rol |
 |----------|---------------|--------|-----|
 | postgres | postgres:18.6 | 5432 | base de datos, con volumen y healthcheck |
-| backend | python:3.13-slim + uv | 8000 | API FastAPI (modo desarrollo) |
+| backend | python:3.13-alpine + uv, multi-stage (builder → runtime), usuario no-root | 8000 | API FastAPI; healthcheck contra `/health` |
 | frontend | node:22-alpine + pnpm | 5173 | SPA Vite (servidor de desarrollo) |
+
+> **Cambio del 02/11/2026 (ticket C27-T7):** la imagen del backend pasa de `python:3.13-slim` a
+> `python:3.13-alpine` en dos etapas, para cumplir el objetivo de menos de 100 MB (la base slim
+> sola ronda los 120 MB). Los extras de `uvicorn[standard]` quedan solo en el grupo de desarrollo:
+> no son necesarios para correr la API y suman unos 23 MB.
 
 ```mermaid
 flowchart LR
