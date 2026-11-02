@@ -10,7 +10,8 @@ usa [Versionado Semántico](https://semver.org/lang/es/).
 - Reglas de negocio del curso como funciones puras (validación del aporte, normalización de enlaces, transiciones de estado) con tests unitarios (ticket C27-T1).
 - Reglas del roadmap personal como funciones puras (agregar solo cursos publicados y sin repetir, reordenar, quitar y cambiar el avance) con tests unitarios (ticket C27-T2).
 - Reglas de validación de aportes como funciones puras (solo el moderador valida, solo aportes en revisión, motivo obligatorio al rechazar) con tests unitarios (ticket C27-T3).
-- Dockerfile multi-stage del backend sobre `python:3.13-alpine`, con usuario no-root y healthcheck contra `/health` (ticket C27-T7). 
+- Dockerfile multi-stage del backend sobre `python:3.13-alpine`, con usuario no-root y healthcheck contra `/health` (ticket C27-T7).
+- `.dockerignore` del backend y del frontend: el contexto de build excluye dependencias locales, cachés, tests y secretos (ticket C27-T8). 
 
 ### Changed
 - El año de edición de un curso no puede ser futuro (BR-012).

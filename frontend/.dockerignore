@@ -1,0 +1,17 @@
+# Fuera del contexto de build del frontend: no hacen falta para construir la imagen.
+
+# Dependencias de tu máquina: el contenedor instala las suyas desde pnpm-lock.yaml
+node_modules
+
+# Resultados de builds y de tests
+dist
+coverage
+.vite
+
+# Tests (no forman parte de la app)
+**/*.test.js
+**/*.test.jsx
+
+# Secretos
+.env
+.env.*
