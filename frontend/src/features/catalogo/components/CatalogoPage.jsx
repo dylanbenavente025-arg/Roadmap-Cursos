@@ -2,7 +2,7 @@ import { useCursos } from '../hooks/useCursos.js'
 import CursoCard from './CursoCard.jsx'
 
 export default function CatalogoPage() {
-  const { estado, datos, reintentar } = useCursos()
+  const { estado, cursos, total, refetch } = useCursos()
 
   return (
     <section aria-labelledby="titulo-catalogo">
@@ -19,7 +19,7 @@ export default function CatalogoPage() {
       {estado === 'error' && (
         <div className="estado estado--error" role="alert">
           <p>No pudimos cargar el catálogo.</p>
-          <button type="button" className="boton" onClick={reintentar}>
+          <button type="button" className="boton" onClick={refetch}>
             Reintentar
           </button>
         </div>
@@ -34,10 +34,10 @@ export default function CatalogoPage() {
       {estado === 'ok' && (
         <>
           <p className="card__meta">
-            Mostrando {datos.items.length} de {datos.total} cursos
+            Mostrando {cursos.length} de {total} cursos
           </p>
           <div className="catalogo-grid">
-            {datos.items.map((curso) => (
+            {cursos.map((curso) => (
               <CursoCard key={curso.id} curso={curso} />
             ))}
           </div>

@@ -170,7 +170,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 > según el [flujo de Git](GIT_WORKFLOW.md), más sus commits convencionales. Esta tabla se actualiza mientras se avanza.
 
 | 0.1 | Estructura de carpetas | M0 | [x] | feat/T1-scaffold-estructura · 22e6feb |
-| 0.2 | docker-compose con PostgreSQL | M0 | [ ] | parcial: compose, volumen y `.env.example` en feat/T4-docker-compose-dev · 13dd39b; falta el healthcheck (postergado por el ticket del 27/10) |
+| 0.2 | docker-compose con PostgreSQL | M0 | [x] | feat/T4-docker-compose-dev · 13dd39b + docker/C27-T10-compose-healthchecks (healthcheck) |
 | 0.3 | Backend FastAPI mínimo | M0 | [x] | feat/T2-backend-minimo · 5958d47 |
 | 0.4 | SQLAlchemy y Alembic | M0 | [ ] | parcial: engine de SQLAlchemy en feat/T2-backend-minimo · 5958d47; falta Alembic |
 | 0.5 | Errores y paginación compartidos | M0 | [x] | feat/T2-backend-minimo · 5958d47 |
@@ -186,15 +186,15 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 1.7 | Seed del moderador | M1 | [ ] | |
 | 1.8 | Cliente HTTP, sesión y header | M1 | [ ] | |
 | 1.9 | Pantallas Registro y Login | M1 | [ ] | |
-| 2.1 | Migración `categorias` y `cursos` | M2 | [ ] | |
-| 2.2 | Seed de categorías y cursos | M2 | [ ] | |
+| 2.1 | Migración `categorias` y `cursos` | M2 | [ ] | parcial: modelos con índices y constraints en test/C27-T4-repository-cursos (tablas con create_all); falta la migración con Alembic |
+| 2.2 | Seed de categorías y cursos | M2 | [ ] | parcial: seed idempotente con categorías y 3 cursos en test/C27-T4-repository-cursos; faltan el moderador con credenciales y la opción de 1.000 cursos |
 | 2.3 | `GET /categorias` | M2 | [ ] | |
-| 2.4 | `GET /cursos` | M2 | [ ] | parcial: endpoint paginado con datos en memoria en feat/T2-backend-minimo · 5958d47; falta leer de PostgreSQL |
+| 2.4 | `GET /cursos` | M2 | [x] | test/C27-T4-repository-cursos (lee de PostgreSQL, solo publicados, paginado) |
 | 2.5 | `GET /cursos/{id}` | M2 | [ ] | |
 | 2.6 | Componentes compartidos | M2 | [ ] | |
 | 2.7 | Pantalla Catálogo | M2 | [ ] | |
 | 2.8 | Pantalla Detalle | M2 | [ ] | |
-| 3.1 | Normalización de enlaces | M3 | [ ] | |
+| 3.1 | Normalización de enlaces | M3 | [x] | test/C27-T1-reglas-curso (`normalizar_url`, con tests) |
 | 3.2 | `POST /aportes` | M3 | [ ] | |
 | 3.3 | `GET /aportes/pendientes` | M3 | [ ] | |
 | 3.4 | `POST /aportes/{id}/validar` | M3 | [ ] | |
@@ -209,7 +209,7 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | 7.1 | README de ejecución | M7 | [ ] | |
 | 7.2 | Verificación en máquina limpia | M7 | [ ] | |
 | 7.3 | Actualizar esta tabla | M7 | [ ] | |
-| 5.1 | Búsqueda y filtros (P1) | M5 | [ ] | |
+| 5.1 | Búsqueda y filtros (P1) | M5 | [ ] | parcial: `q` y `categoria` en `GET /cursos` en test/C27-T4-repository-cursos; falta la búsqueda en la pantalla |
 | 5.2 | `GET /aportes/mios` (P1) | M5 | [ ] | |
 | 5.3 | Pantalla Mis aportes (P1) | M5 | [ ] | |
 | 5.4 | `PATCH` y `mover` del roadmap (P1) | M5 | [ ] | |
@@ -225,8 +225,8 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 > Se **planifica** acá y se **implementa** en la clase del 27/10.
 
 - **Unit tests (services), patrón AAA, sin base de datos ni HTTP:** hash y validación de contraseñas (1.2), rate limiter con reloj inyectado (1.4), normalización de enlaces (3.1), transiciones de estado del curso y exigencia de motivo al rechazar (3.4), reglas del roadmap (BR-006 y BR-007).
-- **Integration tests (repositories y routers):** contra el PostgreSQL del Compose, con una base de pruebas aparte: unicidad de email y de enlace, paginación con `total`, filtros de estado en el catálogo, aislamiento del roadmap entre usuarios y permisos por rol.
-- **Frontend:** hooks y componentes con Vitest y Testing Library: estados de carga, vacío y error del catálogo, paginador, formulario de aporte con validación en línea.
+- **Integration tests (repositories y routers):** contra el PostgreSQL del Compose, en la base `aprovechaelbug_test` (TRD TD-008), con cada test dentro de una transacción que se deshace. Antes de correrlos: `docker compose up -d postgres --wait`. Implementados para el `CursoRepository`, el endpoint `GET /api/v1/cursos` y el seed (ticket C27-T4).
+- **Frontend:** tests del hook `useCursos` con Vitest y Testing Library en jsdom, con la API simulada (`vi.mock`): carga inicial, error de red, paginación, filtros y `refetch` (ticket C27-T6). Se ejecutan con `pnpm test` dentro de `frontend`. Pendiente: tests de componentes (paginador, formulario de aporte).
 - **Objetivo de cobertura:** al menos 85 % en los services del backend.
 
 ## 6. Riesgos del plan
@@ -239,6 +239,15 @@ Las flechas son dependencias reales: no se prueba el catálogo sin el scaffold, 
 | El rate limiting pierde sentido por la IP del contenedor | medio | verificar en 1.5 que el backend recibe `X-Forwarded-For` desde el proxy de Vite (TRD §6) |
 | El formulario de aporte (11 campos) y su validación llevan más de lo estimado | medio | un schema de validación único por campo en el backend; en el frontend reglas simples que repliquen las del BackendSchema §3.3 |
 | El punto de montaje del volumen de PostgreSQL 18 es distinto al de versiones anteriores | bajo | consultar la documentación de la imagen en 0.2 y probar `docker compose down` y `up` conservando los datos |
+| C27-T5 depende del login, que todavía no existe | medio | las reglas de validación y permisos ya están probadas (C27-T3); al terminar M1 y M3, el test de integración reutiliza las fixtures de `conftest.py` |
+
+## 7. Lecciones del ciclo de la clase del 27/10
+
+- **Primero las reglas puras, después la persistencia.** Escribir las reglas de curso, roadmap y validación como funciones puras (C27-T1 a T3) permitió probarlas sin base de datos ni HTTP; los services de M3 y M4 las van a reusar en lugar de reimplementarlas.
+- **Los tests de integración necesitan el entorno levantado.** Corren contra el PostgreSQL del Compose (TRD TD-008): antes de `uv run pytest` hace falta `docker compose up -d postgres --wait`. Cada test corre en una transacción que se deshace, así que no dejan datos.
+- **Las imágenes de los tickets se adaptan al proyecto.** Con `python:slim` y `nginx:alpine` no se cumplen los objetivos de tamaño; se midió con `docker history` y se pasó a `alpine` y `alpine-slim`.
+- **`depends_on` sin healthcheck no alcanza.** El backend crea las tablas al arrancar: sin `condition: service_healthy` podría arrancar antes de que PostgreSQL acepte conexiones.
+- **Pendiente para el próximo ciclo:** C27-T5 (tests de integración del flujo aporte → validación) se hace cuando estén las tareas 1.1 a 1.9 (identidad) y 3.2 a 3.4 (endpoints de aportes); las reglas que va a usar ya están probadas (C27-T1 y C27-T3).
 
 ---
 

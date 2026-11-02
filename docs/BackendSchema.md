@@ -273,7 +273,7 @@ Campos de `POST /api/v1/aportes`:
 | `titulo` | obligatorio; hasta 200 caracteres |
 | `tema` | obligatorio; hasta 120 caracteres |
 | `version` | obligatorio; hasta 50 caracteres |
-| `anio_edicion` | obligatorio; entero entre 1990 y 2100 |
+| `anio_edicion` | obligatorio; entero entre 1990 y el año en curso (BR-012) |
 | `docentes` | obligatorio; hasta 300 caracteres |
 | `tiene_cuestionarios`, `requiere_examen`, `extiende_certificado` | obligatorios; booleanos |
 | `aval_organizacion` | opcional; hasta 150 caracteres |
@@ -385,6 +385,7 @@ Ejemplo de ítem:
 | BR-009 | rate limiting en memoria del service de identidad (TD-005) y respuesta 429 |
 | BR-010 | bcrypt costo 12; contraseña de 8 a 72 caracteres (72 es el límite de bcrypt) |
 | BR-011 | índice único sobre `lower(email)` y respuesta 409 |
+| BR-012 | regla en el service (`validar_datos_aporte`, con el año actual inyectado); el `CHECK` de la base (1990–2100) queda como red de seguridad, porque un `CHECK` de PostgreSQL no puede depender de la fecha actual |
 
 ---
 

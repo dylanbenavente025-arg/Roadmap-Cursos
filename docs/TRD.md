@@ -32,6 +32,7 @@ Versiones verificadas el 23/10/2026 (ver [SPEC §6](SPEC.md)).
 | TD-005 | Rate limiting del login (BR-009) | `slowapi` · tabla en PostgreSQL · Redis · implementación propia en memoria | Implementación propia en memoria: contador de fallos por clave `IP + email` en ventana deslizante de 15 min, máximo 5; responde 429 con `Retry-After` | Un solo proceso en desarrollo, sin servicios nuevos, y la lógica queda como función pura con reloj inyectable, testeable el 27/10. Se pierde al reiniciar el backend (riesgo aceptado, ver §6) |
 | TD-006 | Recuperación de contraseña (BR-008) | SMTP real · MailHog · registro en el log | Token aleatorio (`secrets.token_urlsafe(32)`); se guarda solo su hash SHA-256 con vencimiento a 1 h y marca de uso. El enlace de restablecimiento se escribe en el log del backend | Sin servidor de correo en desarrollo. Guardar solo el hash evita que una filtración de la base entregue tokens usables |
 | TD-007 | Datos iniciales | cargar a mano · migración de datos · script de seed | Script `seed` idempotente que crea categorías, el moderador (credenciales desde variables de entorno) y cursos de prueba para el catálogo | Reproducible en una máquina limpia (RNF-009) y permite medir RNF-007 con datos |
+| TD-008 | Base de datos de los tests de integración | SQLite en memoria · PostgreSQL del docker-compose | PostgreSQL del Compose, en una base aparte (`aprovechaelbug_test`) que se crea sola; cada test corre en una transacción que se deshace al final | La app usa tipos `ENUM`, índices parciales, `IDENTITY` e `ILIKE`, que SQLite no tiene o imita distinto: un test que pasa en SQLite puede fallar en producción. El costo es tener PostgreSQL levantado (`docker compose up -d postgres --wait`) |
 
 
 ## 3. Arquitectura
@@ -110,9 +111,22 @@ Los módulos `categorias`, `cursos`, `aportes` y `roadmap` repiten la estructura
 
 | Servicio | Imagen / base | Puerto | Rol |
 |----------|---------------|--------|-----|
-| postgres | postgres:18.6 | 5432 | base de datos, con volumen y healthcheck |
-| backend | python:3.13-slim + uv | 8000 | API FastAPI (modo desarrollo) |
-| frontend | node:22-alpine + pnpm | 5173 | SPA Vite (servidor de desarrollo) |
+| postgres | postgres:18.6 | 5432 | base de datos, con volumen `pgdata` y healthcheck `pg_isready` |
+| backend | python:3.13-alpine + uv, multi-stage (builder → runtime), usuario no-root | 8000 | API FastAPI; healthcheck contra `/health` |
+| frontend | nginx:alpine-slim, multi-stage (builder `node:22-alpine` + pnpm → runtime nginx) | 80 (publicado en 5173) | sirve el build de Vite, proxy de `/api/` al backend, caché de assets y cabeceras de seguridad |
+
+> **Cambio del 02/11/2026 (ticket C27-T7):** la imagen del backend pasa de `python:3.13-slim` a
+> `python:3.13-alpine` en dos etapas, para cumplir el objetivo de menos de 100 MB (la base slim
+> sola ronda los 120 MB). Los extras de `uvicorn[standard]` quedan solo en el grupo de desarrollo:
+> no son necesarios para correr la API y suman unos 23 MB.
+> **Cambio del 02/11/2026 (ticket C27-T9):** en Compose, el frontend deja de correr el servidor de
+> desarrollo de Vite y pasa a servir el build con nginx (`frontend/nginx.conf`). Se usa
+> `nginx:alpine-slim` porque `nginx:alpine` supera el objetivo de 30 MB. Para desarrollar con
+> recarga automática se sigue usando `pnpm dev` en la máquina local.
+> **Cambio del 02/11/2026 (ticket C27-T10):** los servicios arrancan en cascada con
+> `depends_on: condition: service_healthy` (postgres → backend → frontend). Los healthchecks del
+> backend y del frontend están en sus Dockerfiles; el de postgres, en el Compose, porque se usa la
+> imagen oficial sin modificar. `docker compose up --build -d --wait` termina cuando los tres están healthy.
 
 ```mermaid
 flowchart LR
@@ -156,6 +170,18 @@ flowchart LR
   | 429 | `RATE_LIMITED` | login bloqueado; incluye el encabezado `Retry-After` |
   | 500 | `INTERNAL_ERROR` | error inesperado, sin detalles internos |
 
+  - **Códigos de error del dominio:** las reglas de negocio lanzan `ErrorDeNegocio` (`backend/app/excepciones.py`) con un `code` estable. **Los tests y el frontend dependen del `code`, nunca del texto del mensaje**: el mensaje está escrito para personas y se puede reescribir sin romper nada, mientras que el `code` es parte del contrato de la API. El handler HTTP traduce cada código así:
+
+  | `code` del dominio | HTTP | Cuándo |
+  |--------------------|------|--------|
+  | `CAMPO_OBLIGATORIO`, `TEXTO_DEMASIADO_LARGO`, `URL_INVALIDA`, `ANIO_FUERA_DE_RANGO`, `ANIO_FUTURO`, `DECLARACION_OBLIGATORIA` | 422 | datos del aporte inválidos (van en `details`, uno por campo) |
+  | `MOTIVO_OBLIGATORIO`, `MOTIVO_DEMASIADO_LARGO` | 422 | rechazo sin motivo o con motivo demasiado largo |
+  | `URL_DUPLICADA` | 409 | el enlace ya fue aportado (BR-004) |
+  | `APORTE_YA_DECIDIDO`, `TRANSICION_INVALIDA` | 409 | el aporte ya fue aprobado o rechazado |
+  | `CURSO_YA_INCLUIDO` | 409 | el curso ya está en el roadmap (BR-007) |
+  | `PERMISO_DENEGADO` | 403 | el usuario no tiene el rol necesario (BR-005) |
+  | `CURSO_NO_ENCONTRADO`, `CURSO_NO_PUBLICADO`, `CURSO_NO_EN_ROADMAP` | 404 | el curso no existe, no está publicado o no está en el roadmap |
+
 - **Variables de entorno** (el repo incluye `.env.example`; el `.env` real no se versiona):
 
   | Variable | Ejemplo | Obligatoria | Descripción |
@@ -195,7 +221,7 @@ flowchart LR
 | Cookie `HttpOnly` con `SameSite=Lax` y falta de protección CSRF explícita | baja | medio | solo se aceptan peticiones JSON, y `SameSite=Lax` bloquea envíos entre sitios con métodos que modifican datos; revisar si se agregan formularios clásicos |
 | El punto de montaje del volumen de PostgreSQL 18 cambió respecto de versiones anteriores | media | bajo | consultar la documentación de la imagen al escribir el `docker-compose.yml`, y probar `down` y `up` conservando datos |
 | El formulario de aporte tiene muchos campos y su validación consume más tiempo | media | medio | un único schema de validación por campo en backend y reglas equivalentes en frontend |
-
+| Las tablas se crean con `create_all` al arrancar, que no aplica cambios sobre tablas existentes | alta | medio | solución temporal hasta las migraciones con Alembic (tarea 0.4); mientras tanto, ante un cambio de modelo, `docker compose down -v` recrea la base |
 ---
 
 **Referencia:**
